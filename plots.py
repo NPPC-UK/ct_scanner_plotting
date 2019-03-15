@@ -7,6 +7,7 @@ import numpy as np
 
 from scipy.stats import gaussian_kde
 
+
 def plot_sorted_property(prop, names, property_name='Property'):
     median_prop = median(prop)
 
@@ -21,8 +22,6 @@ def plot_sorted_property(prop, names, property_name='Property'):
 
     high_derivatives = sorted(enumerate(derivative_prop_cp), 
                               key=lambda x: x[1])[-10:]
-
-    print(high_derivatives)
 
     left, width = 0.1, 0.65
     bottom, height = 0.35, 0.64
@@ -66,10 +65,20 @@ def plot_sorted_property(prop, names, property_name='Property'):
 
     axHist.hist(prop, bins=bins, orientation='horizontal')
     axHist.set_ylim(axScatter.get_ylim())
+    axHist_xlim = axHist.get_xlim()
 
     axSmoothedHist.set_xlim([axHist.get_xlim()[0], axSmoothedHist.get_xlim()[1]])
 
     axDeriv.plot(derivative_prop, color='black', linewidth=0.8)
+
+    axDeriv.scatter([i for i, v in high_derivatives], 
+                    [v for i, v in high_derivatives],
+                    color='red', s=15) 
+
+    axScatter.scatter([i for i, v in high_derivatives],
+                      [prop[i] for i, v in high_derivatives],
+                      color='red', s=10)
+
 
     fig.savefig('plot_{}.svg'.format(property_name.replace(' ', '_')))
     fig.clf()
