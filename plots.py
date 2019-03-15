@@ -14,6 +14,7 @@ def plot_sorted_property(prop, names, property_name='Property'):
     sorted_data = sorted(zip(prop, names), key=lambda x: x[0]) 
 
     prop = [prop for prop, name in sorted_data]
+    names = [name for prop, name in sorted_data]
     derivative_prop = [j-i for i, j in zip(prop[:-1], prop[1:])]
 
     derivative_prop_cp = list(derivative_prop)
@@ -78,6 +79,20 @@ def plot_sorted_property(prop, names, property_name='Property'):
     axScatter.scatter([i for i, v in high_derivatives],
                       [prop[i] for i, v in high_derivatives],
                       color='red', s=10)
+
+    t = ("Sorted highest Derivatives (red):\n" + 
+         ", ".join(["{}"]*10) + 
+         "\n").format(*[names[i] for i, v in high_derivatives])
+
+    t += ("Lowest Values:\n" +
+          ", ".join(["{}"]*10) + 
+          "\n").format(*names[:10])
+
+    t += ("Highest Values:\n" +
+          ", ".join(["{}"]*10) + 
+          "\n").format(*names[-10:])
+
+    fig.text(left_h, 0.05, t, wrap=True, fontsize=9)
 
 
     fig.savefig('plot_{}.svg'.format(property_name.replace(' ', '_')))
