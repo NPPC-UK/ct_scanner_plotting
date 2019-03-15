@@ -6,6 +6,26 @@ import numpy as np
 
 from plots import plot_sorted_property
 
+def get_nth_property(n, data):
+    props = []
+    names = []
+    for i, v in data.items():
+        props.append(v[:, n])
+        names.append(i)
+
+    return (props, names)
+
+def group_data(data, names):
+    grouped_data = {}
+
+    for d, name in zip(data, names):
+        if name[:-2] not in grouped_data:
+            grouped_data[name[:-2]] = list(d)
+        else:
+            grouped_data[name[:-2]] += list(d)
+
+    return grouped_data
+
 meta_file = '/mnt/mass/max/BR09_CTdata/mnt/mass/scratch/br09_data/BR9_scan_list.csv'
 base_path = Path('/mnt/mass/max/BR09_CTdata/mnt/mass/scratch/br09_data')
 
@@ -36,14 +56,6 @@ for scan in meta_data:
     data[scan[0]] = grains
 
 
-def get_nth_property(n, data):
-    props = []
-    names = []
-    for i, v in data.items():
-        props.append(v[:, n])
-        names.append(i)
-
-    return (props, names)
 
 
 
@@ -57,3 +69,14 @@ plot_sorted_property([mean(((3/(4*pi))*volume)**(1./3)) for volume in volumes], 
 
 n_grains = [len(grains) for grains in volumes]
 plot_sorted_property(n_grains, names, property_name='number of grains')
+
+grouped_volumes = group_data(volumes, names).items()
+
+names = [name for name, volume in grouped_volumes]
+volumes = [volume for name, volume in grouped_volumes]
+
+plot_sorted_property([mean(volume) for volume in volumes], names,
+                     property_name='grouped mean volume of grains')
+
+n_grains = [len(grains) for grains in volumes]
+plot_sorted_property(n_grains, names, property_name='grouped number of grains')
