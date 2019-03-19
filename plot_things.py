@@ -6,6 +6,7 @@ import numpy as np
 
 from plots import plot_sorted_property
 
+
 def get_nth_property(n, data):
     props = []
     names = []
@@ -20,7 +21,7 @@ def get_properties(ns, data):
     for i, v in data.items():
         name_item = (i,)
         for n in ns:
-            name_item += (v[:, n],) 
+            name_item += (v[0][:, n],) 
 
         d.append(name_item)
 
@@ -99,7 +100,18 @@ def main():
     n_grains = [len(grains) for grains in volumes]
     plot_sorted_property(n_grains, names, property_name='grouped number of grains')
 
-    
+    names, sphericities, lengths = [], [], []
+    for name, (np_data, length) in data.items():
+        names.append(name)
+
+        ideal_surface_area = pi**(1./3)*(6*np_data[:, 5])**(2./3)
+        sphericity = np.mean(np.divide(ideal_surface_area, np_data[:, 7]))
+        sphericities.append(sphericity)
+
+        lengths.append(length)
+
+    plot_sorted_property(sphericities, names, property_name='mean sphericity of grains')
+
 
 if __name__ == '__main__':
     main()
