@@ -3,6 +3,7 @@ from math import pi
 from statistics import mean
 
 import numpy as np
+import matplotlib.pyplot as plt
 
 from plots import (plot_sorted_property, plot_property_vs_property, 
                    plot_pearson_correlations)
@@ -38,6 +39,19 @@ def group_data(data, names):
 
     return grouped_data
 
+def filter_grains(grains, bottom, top):
+    false_grains_idxs = []
+
+    for idx, grain in enumerate(grains):
+        bottom_dist = np.linalg.norm(grain[9:12] - bottom)
+        top_dist = np.linalg.norm(grain[9:12] - top)
+
+        near_ends = bottom_dist < 10 or top_dist < 10
+        if near_ends:
+            false_grains_idxs.append(idx)
+
+    return np.delete(grains, false_grains_idxs, 0)
+
 
 def get_data(meta_file, base_path):
     meta_type = np.dtype([
@@ -66,8 +80,13 @@ def get_data(meta_file, base_path):
         except IndexError:
             continue
 
-        grains = np.genfromtxt(grains_file, delimiter=',', skip_header=1)
         length = np.genfromtxt(length_file, delimiter=',', skip_header=0)
+        grains = filter_grains(
+            np.genfromtxt(grains_file, delimiter=',', skip_header=1),
+            length[1:4],
+            length[4:]
+        )
+
         data[scan[0]] = (grains, length[0])
 
     return data
