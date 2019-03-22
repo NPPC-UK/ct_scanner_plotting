@@ -4,8 +4,8 @@ from statistics import mean
 
 import numpy as np
 
-from plots import plot_sorted_property
-
+from plots import (plot_sorted_property, plot_property_vs_property, 
+                   plot_pearson_correlations)
 
 def get_nth_property(n, data):
     props = []
@@ -81,10 +81,10 @@ def main():
 
     volumes, names = get_nth_property(5, data)
     plot_sorted_property([mean(volume) for volume in volumes], names, 
-                  property_name='mean volume of grains')
+                         property_name='mean volume of grains')
 
     plot_sorted_property([mean(((3/(4*pi))*volume)**(1./3)) for volume in volumes], names,
-                  property_name='mean adjusted radius of grains')
+                         property_name='mean adjusted radius of grains')
 
     n_grains = [len(grains) for grains in volumes]
     plot_sorted_property(n_grains, names, property_name='number of grains')
@@ -100,7 +100,9 @@ def main():
     n_grains = [len(grains) for grains in volumes]
     plot_sorted_property(n_grains, names, property_name='grouped number of grains')
 
-    names, sphericities, lengths = [], [], []
+    names, sphericities, lengths, n_grains, vols, surface_areas = (
+        [], [], [], [], [], []
+    )
     for name, (np_data, length) in data.items():
         names.append(name)
 
@@ -110,8 +112,31 @@ def main():
 
         lengths.append(length)
 
-    plot_sorted_property(sphericities, names, property_name='mean sphericity of grains')
+        n_grains.append(len(np_data[:, 0]))
+        vols.append(np.mean(np_data[:, 5]))
+        surface_areas.append(np.mean(np_data[:, 7]))
 
+    plot_sorted_property(sphericities, names, 
+                         property_name='mean sphericity of grains')
+    plot_sorted_property(lengths, names, 
+                         property_name='length of pod')
+
+    plot_property_vs_property(lengths, n_grains, names, 'length of pod', 
+                              'number of grains')
+
+    plot_property_vs_property(lengths, vols, names, 'length of pod', 
+                              'mean volume of grains')
+
+    plot_property_vs_property(n_grains, vols, names, 'number of grains', 
+                              'mean volume of grains')
+
+    plot_property_vs_property(vols, sphericities, names, 'mean volume of grains',
+                              'mean sphericities')
+
+    plot_pearson_correlations(
+        [lengths, n_grains, vols, sphericities, surface_areas],
+        ['length', 'n_grains', 'volumes', 'sphericities', 'surface_areas']
+    )
 
 if __name__ == '__main__':
     main()
