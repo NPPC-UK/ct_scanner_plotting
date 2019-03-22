@@ -32,10 +32,10 @@ def group_data(data, names):
     grouped_data = {}
 
     for d, name in zip(data, names):
-        if name[:-2] not in grouped_data:
-            grouped_data[name[:-2]] = list(d)
+        if name[:-3] not in grouped_data:
+            grouped_data[name[:-3]] = list(d)
         else:
-            grouped_data[name[:-2]] += list(d)
+            grouped_data[name[:-3]] += list(d)
 
     return grouped_data
 
