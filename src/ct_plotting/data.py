@@ -47,7 +47,13 @@ class Pod:
     def sphericities(self):
         return [g.sphericity() for g in self.grains]
 
+    def filter(self):
+        return self
+
     def __eq__(self, other):
+        if len(self.grains) != len(other.grains):
+            return False
+
         grains_equal = all(
             [s_grain == o_grain for s_grain, o_grain in 
              zip(self.grains, other.grains)]
