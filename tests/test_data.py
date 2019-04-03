@@ -3,6 +3,11 @@ import numpy as np
 from ct_plotting.data import Pod
 import pytest
 
+grain_data = None
+length = None
+pod = None
+
+
 def setup_module(module):
     module.grain_data = np.array(
         [[4.81600000e-01, 1.32230554e+00, 1.20479616e+00, 3.64212345e-01,
@@ -104,34 +109,38 @@ def setup_module(module):
          [1.85760000e+00, 1.14378518e+00, 1.09326094e+00, 1.62408119e+00,
           1.04384500e+00, 1.48468700e+00, 7.94433970e-02, 9.29016491e+00,
           0.00000000e+00, 2.82914016e+02, 3.02092564e+02, 9.50587629e+02,
-          1.00000000e+00, 1.00000000e+00]] 
+          1.00000000e+00, 1.00000000e+00]]
     )
     module.length = np.array([2000, 0, 0, 0, 0, 0, 2000])
-    module.pod = Pod(module.grain_data, module.length[4:], length[1:4], 
+    module.pod = Pod(module.grain_data, module.length[4:], length[1:4],
                      'TestPod')
 
 
 def test_calculate_correct_volume():
-    assert (pytest.approx(pod.mean_volume(), 1e-8) == 
+    assert (pytest.approx(pod.mean_volume(), 1e-8) ==
             np.mean(grain_data, axis=0)[5])
 
+
 def test_calculate_correct_surface_area():
-    assert (pytest.approx(pod.mean_surface_area(), 1e-8) == 
+    assert (pytest.approx(pod.mean_surface_area(), 1e-8) ==
             np.mean(grain_data, axis=0)[7])
 
+
 def test_sphericities_returns_type_list():
-    assert type([]) == type(pod.sphericities())
+    assert isinstance(pod.sphericities(), type([]))
+
 
 def test_volumes_returned_in_insertion_order():
     assert list(pod.volumes()) == list(grain_data[:, 5])
+
 
 def test_pod_can_load_grain_from_file(tmpdir):
     np.savetxt(tmpdir / 'grain.csv', grain_data, delimiter=',',
                header='some, header, dont, worry, about, it')
     np.savetxt(tmpdir / 'lengths.csv', length, delimiter=',')
 
-    p_file = Pod.pod_from_files(Pod, tmpdir / 'grain.csv', 
-                                tmpdir / 'lengths.csv', 
+    p_file = Pod.pod_from_files(Pod, tmpdir / 'grain.csv',
+                                tmpdir / 'lengths.csv',
                                 'TestName')
 
     p_direct = Pod(grain_data, length[4:], length[1:4], 'TestName')
@@ -140,7 +149,7 @@ def test_pod_can_load_grain_from_file(tmpdir):
 
 def test_pod_rejects_impossible_pod_geometry():
     with pytest.raises(ValueError):
-        pod = Pod(grain_data, [0, 0, 1], [0, 0, 0], 'ImpossiblePod')
+        Pod(grain_data, [0, 0, 1], [0, 0, 0], 'ImpossiblePod')
 
 
 def test_pod_filters_grains_less_than_10_from_ends():

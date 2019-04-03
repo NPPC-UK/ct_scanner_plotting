@@ -14,9 +14,11 @@ class Pod:
         for grain in grains:
             g_obj = Grain(grain)
 
-            if (g_obj.position[2] < self.bottom[2] or 
-                g_obj.position[2] > self.top[2]):
-                raise ValueError("Grain {} is outside pod limits".format(g_obj))
+            if (g_obj.position[2] < self.bottom[2] or
+               g_obj.position[2] > self.top[2]):
+                raise ValueError(
+                    "Grain {} is outside pod limits".format(g_obj)
+                )
 
             self.grains.append(g_obj)
 
@@ -55,12 +57,12 @@ class Pod:
             return False
 
         grains_equal = all(
-            [s_grain == o_grain for s_grain, o_grain in 
+            [s_grain == o_grain for s_grain, o_grain in
              zip(self.grains, other.grains)]
         )
 
-        return (grains_equal and 
-                self.top == other.top and 
+        return (grains_equal and
+                self.top == other.top and
                 self.bottom == other.bottom)
 
 
