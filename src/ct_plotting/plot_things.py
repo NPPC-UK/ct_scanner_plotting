@@ -6,8 +6,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import networkx as nx
 
-from plots import (plot_sorted_property, plot_property_vs_property, 
-                   plot_pearson_correlations)
+from ct_plotting.plots import (plot_sorted_property, plot_property_vs_property, 
+                               plot_pearson_correlations)
 
 def get_nth_property(n, data):
     props = []
