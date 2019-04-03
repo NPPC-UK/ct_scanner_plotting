@@ -138,3 +138,6 @@ def test_pod_can_load_grain_from_file(tmpdir):
     assert p_direct == p_file
 
 
+def test_pod_rejects_impossible_pod_geometry():
+    with pytest.raises(ValueError):
+        pod = Pod(grain_data, [0, 0, 0], [0, 0, 1], 'ImpossiblePod')
