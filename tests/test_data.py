@@ -106,8 +106,8 @@ def setup_module(module):
           0.00000000e+00, 2.82914016e+02, 3.02092564e+02, 9.50587629e+02,
           1.00000000e+00, 1.00000000e+00]] 
     )
-    module.length = np.array([100, 0, 0, 0, 0, 0, 100])
-    module.pod = Pod(module.grain_data, module.length[1:4], length[4:], 
+    module.length = np.array([2000, 0, 0, 0, 0, 0, 2000])
+    module.pod = Pod(module.grain_data, module.length[4:], length[1:4], 
                      'TestPod')
 
 
@@ -134,10 +134,10 @@ def test_pod_can_load_grain_from_file(tmpdir):
                                 tmpdir / 'lengths.csv', 
                                 'TestName')
 
-    p_direct = Pod(grain_data, length[1:4], length[4:], 'TestName')
+    p_direct = Pod(grain_data, length[4:], length[1:4], 'TestName')
     assert p_direct == p_file
 
 
 def test_pod_rejects_impossible_pod_geometry():
     with pytest.raises(ValueError):
-        pod = Pod(grain_data, [0, 0, 0], [0, 0, 1], 'ImpossiblePod')
+        pod = Pod(grain_data, [0, 0, 1], [0, 0, 0], 'ImpossiblePod')

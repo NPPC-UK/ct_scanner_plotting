@@ -24,8 +24,8 @@ class Pod:
         length = np.genfromtxt(length_file, delimiter=',', skip_header=0)
         return cls(
             np.genfromtxt(grains_file, delimiter=',', skip_header=1),
-            length[1:4],
             length[4:],
+            length[1:4],
             name
         )
 
