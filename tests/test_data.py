@@ -141,3 +141,26 @@ def test_pod_can_load_grain_from_file(tmpdir):
 def test_pod_rejects_impossible_pod_geometry():
     with pytest.raises(ValueError):
         pod = Pod(grain_data, [0, 0, 1], [0, 0, 0], 'ImpossiblePod')
+
+
+def test_pod_filters_grains_less_than_10_from_ends():
+    implausible_grains = np.append(
+        grain_data,
+        [
+            [4.81600000e-01, 1.32230554e+00, 1.20479616e+00, 3.64212345e-01,
+             1.00935932e+00, 4.36385300e-01, 7.94433970e-02, 3.07358037e+00,
+             0.00000000e+00, length[1], length[2], length[3]+9.9999999,
+             1.00000000e+00, 1.00000000e+00],
+            [4.81600000e-01, 1.32230554e+00, 1.20479616e+00, 3.64212345e-01,
+             1.00935932e+00, 4.36385300e-01, 7.94433970e-02, 3.07358037e+00,
+             0.00000000e+00, length[4], length[5], length[6]-9.9999999,
+             1.00000000e+00, 1.00000000e+00]
+        ],
+        axis=0
+    )
+
+    print(implausible_grains)
+    imp_pod = Pod(implausible_grains, length[4:], length[1:4], 'Implausible')
+
+    filtered_pod = imp_pod.filter()
+    assert filtered_pod == pod
