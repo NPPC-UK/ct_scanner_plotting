@@ -12,7 +12,13 @@ class Pod:
         self.name = name
 
         for grain in grains:
-            self.grains.append(Grain(grain))
+            g_obj = Grain(grain)
+
+            if (g_obj.position[2] < self.bottom[2] or 
+                g_obj.position[2] > self.top[2]):
+                raise ValueError("Grain {} is outside pod limits".format(g_obj))
+
+            self.grains.append(g_obj)
 
     def pod_from_files(cls, grains_file, length_file, name):
         length = np.genfromtxt(length_file, delimiter=',', skip_header=0)
