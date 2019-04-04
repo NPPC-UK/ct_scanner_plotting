@@ -7,15 +7,15 @@ import numpy as np
 class Pod:
     def __init__(self, grains, top, bottom, name):
         self.grains = []
-        self.top = list(top)
-        self.bottom = list(bottom)
+        self.top = Point(*list(top))
+        self.bottom = Point(*list(bottom))
         self.name = name
 
         for grain in grains:
             g_obj = Grain(grain)
 
-            if (g_obj.position[2] < self.bottom[2] or
-               g_obj.position[2] > self.top[2]):
+            if (g_obj.position.z < self.bottom.z or
+               g_obj.position.z > self.top.z):
                 raise ValueError(
                     "Grain {} is outside pod limits".format(g_obj)
                 )
@@ -56,8 +56,8 @@ class Pod:
     def _near_ends(self):
         near_ends = []
         for idx, grain in enumerate(self.grains):
-            bottom_dist = np.linalg.norm(grain.position - self.bottom)
-            top_dist = np.linalg.norm(grain.position - self.top)
+            bottom_dist = (grain.position - self.bottom).norm()
+            top_dist = (grain.position - self.top).norm()
 
             near_ends.append(bottom_dist < 10 or top_dist < 10)
 
@@ -79,7 +79,7 @@ class Pod:
 
 class Grain:
     def __init__(self, grain):
-        self.position = grain[9:12]
+        self.position = Point(*list(grain[9:12]))
         self.volume = grain[5]
         self.surface_area = grain[7]
 
@@ -87,7 +87,7 @@ class Grain:
         return (math.pi**(1./3) * (6*self.volume)**(2./3))/self.surface_area
 
     def __eq__(self, other):
-        return (all(self.position == other.position) and
+        return (self.position == other.position and
                 self.volume == other.volume and
                 self.surface_area == other.surface_area)
 
@@ -115,7 +115,11 @@ class Point():
     def __repr__(self):
         return "Point({}, {}, {})".format(self.x, self.y, self.z)
 
+    def __eq__(self, other):
+        return self.x == other.x and self.y == other.y and self.z == other.z
+
     def norm(self):
         return math.sqrt(
             self.x**2 + self.y**2 + self.z**2
         )
+
