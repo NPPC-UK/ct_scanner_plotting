@@ -90,3 +90,32 @@ class Grain:
         return (all(self.position == other.position) and
                 self.volume == other.volume and
                 self.surface_area == other.surface_area)
+
+
+class Point():
+    def __init__(self, x, y, z):
+        self.x = x
+        self.y = y
+        self.z = z
+
+    def __add__(self, other):
+        return type(self)(
+            self.x + other.x,
+            self.y + other.y,
+            self.z + other.z
+        )
+
+    def __sub__(self, other):
+        return type(self)(
+            self.x - other.x,
+            self.y - other.y,
+            self.z - other.z
+        )
+
+    def __repr__(self):
+        return "Point({}, {}, {})".format(self.x, self.y, self.z)
+
+    def norm(self):
+        return math.sqrt(
+            self.x**2 + self.y**2 + self.z**2
+        )
