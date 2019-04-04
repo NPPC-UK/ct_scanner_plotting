@@ -1,6 +1,6 @@
 import numpy as np
 
-from ct_plotting.data import Pod
+from ct_plotting.data import Pod, Point
 import pytest
 
 grain_data = None
@@ -171,3 +171,29 @@ def test_pod_filters_grains_less_than_10_from_ends():
     imp_pod = Pod(implausible_grains, length[4:], length[1:4], 'Implausible')
     imp_pod.filter()
     assert imp_pod == pod
+
+
+def test_point_addition_is_correct():
+    p1 = Point(1, 2, 3)
+    p2 = Point(1, 2, 3)
+    p3 = p1 + p2
+    assert p3.x == 2
+    assert p3.y == 4
+    assert p3.z == 6
+
+
+def test_point_subtraction_is_correct():
+    p1 = Point(1, 2, 3)
+    p2 = Point(3, 2, 1)
+    p3 = p1 - p2
+    assert p3.x == -2
+    assert p3.y == 0
+    assert p3.z == 2
+
+
+def test_point_magnitud_norm_is_correct_at_000():
+    assert Point(0, 0, 0).norm() == 0
+
+
+def test_point_magnitud_norm_is_correct_at_2_36():
+    assert Point(2, -3, 6).norm() == 7
