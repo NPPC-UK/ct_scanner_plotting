@@ -50,7 +50,18 @@ class Pod:
         return [g.sphericity() for g in self.grains]
 
     def filter(self):
-        return self
+        self.grains = [grain for grain, near_ends in
+                       zip(self.grains, self._near_ends()) if not near_ends]
+
+    def _near_ends(self):
+        near_ends = []
+        for idx, grain in enumerate(self.grains):
+            bottom_dist = np.linalg.norm(grain.position - self.bottom)
+            top_dist = np.linalg.norm(grain.position - self.top)
+
+            near_ends.append(bottom_dist < 10 or top_dist < 10)
+
+        return near_ends
 
     def __eq__(self, other):
         if len(self.grains) != len(other.grains):
