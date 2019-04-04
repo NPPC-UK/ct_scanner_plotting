@@ -4,7 +4,24 @@ import math
 import numpy as np
 
 
-class Pod:
+class Grain_Container:
+    """Abstract base class that generalises between Pods, Treatments and
+    Genotypes.
+
+    All of these things contain a set of Grains, and all of them can
+    calculate mean properties of the grains.
+    """
+    def mean_sphericity(self):
+        raise NotImplementedError()
+
+    def mean_surface_area(self):
+        raise NotImplementedError()
+
+    def mean_volume(self):
+        raise NotImplementedError()
+
+
+class Pod(Grain_Container):
     def __init__(self, grains, top, bottom, name):
         self.grains = []
         self.top = Point(*list(top))
