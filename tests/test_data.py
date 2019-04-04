@@ -168,8 +168,6 @@ def test_pod_filters_grains_less_than_10_from_ends():
         axis=0
     )
 
-    print(implausible_grains)
     imp_pod = Pod(implausible_grains, length[4:], length[1:4], 'Implausible')
-
-    filtered_pod = imp_pod.filter()
-    assert filtered_pod == pod
+    imp_pod.filter()
+    assert imp_pod == pod
