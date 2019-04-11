@@ -1,6 +1,6 @@
 import numpy as np
 
-from ct_plotting.data import Pod, Point
+from ct_plotting.data import Pod, Point, Plant
 import pytest
 
 grain_data = None
@@ -197,3 +197,15 @@ def test_point_magnitud_norm_is_correct_at_000():
 
 def test_point_magnitud_norm_is_correct_at_2_36():
     assert Point(2, -3, 6).norm() == 7
+
+
+def test_plant_correctly_calculates_list_of_properties():
+    pods = [Pod(
+        grain_data, length[4:], length[1:4], 'TestPod{}'.format(i)
+    ) for i in range(0, 10)]
+
+    plant = Plant(pods)
+    assert True
+    assert plant.mean_sphericity() == pod.mean_sphericity()
+    assert plant.mean_volume() == pod.mean_volume()
+    assert plant.mean_surface_area() == pod.mean_surface_area()
