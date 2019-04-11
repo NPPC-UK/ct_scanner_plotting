@@ -12,12 +12,21 @@ class Grain_Container:
     calculate mean properties of the grains.
     """
     def mean_sphericity(self):
-        raise NotImplementedError()
+        return mean(self.sphericities())
 
     def mean_surface_area(self):
-        raise NotImplementedError()
+        return mean(self.surface_areas())
 
     def mean_volume(self):
+        return mean(self.volumes())
+
+    def sphericities(self):
+        raise NotImplementedError()
+
+    def surface_areas(self):
+        raise NotImplementedError()
+
+    def volumes(self):
         raise NotImplementedError()
 
 
@@ -48,14 +57,7 @@ class Pod(Grain_Container):
             name
         )
 
-    def mean_volume(self):
         return mean(self.volumes())
-
-    def mean_surface_area(self):
-        return mean(self.surface_areas())
-
-    def mean_sphericity(self):
-        return mean(self.sphericities())
 
     def volumes(self):
         return [g.volume for g in self.grains]
@@ -92,6 +94,27 @@ class Pod(Grain_Container):
         return (grains_equal and
                 self.top == other.top and
                 self.bottom == other.bottom)
+
+
+class Plant(Grain_Container):
+    def __init__(self, pods):
+        self.pods = pods
+
+    def _list_of_props(self, prop):
+        ls = []
+        for pod in self.pods:
+            ls += prop(pod)
+
+        return ls
+
+    def volumes(self):
+        return self._list_of_props(Pod.volumes)
+
+    def sphericities(self):
+        return self._list_of_props(Pod.sphericities)
+
+    def surface_areas(self):
+        return self._list_of_props(Pod.surface_areas)
 
 
 class Grain:
