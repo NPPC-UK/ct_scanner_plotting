@@ -57,8 +57,6 @@ class Pod(Grain_Container):
             name
         )
 
-        return mean(self.volumes())
-
     def volumes(self):
         return [g.volume for g in self.grains]
 
