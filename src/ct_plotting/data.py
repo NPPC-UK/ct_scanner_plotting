@@ -87,6 +87,9 @@ class Pod(Grain_Container):
     def n_grains(self):
         return len(self.grains)
 
+    def length(self):
+        return (self.top - self.bottom).norm()
+
     def _near_ends(self):
         near_ends = []
         for idx, grain in enumerate(self.grains):
