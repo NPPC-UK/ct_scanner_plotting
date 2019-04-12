@@ -59,6 +59,7 @@ class Pod(Grain_Container):
 
             self.grains.append(g_obj)
 
+    @classmethod
     def pod_from_files(cls, grains_file, length_file, name):
         length = np.genfromtxt(length_file, delimiter=",", skip_header=0)
         return cls(

@@ -451,7 +451,7 @@ def test_pod_can_load_grain_from_file(tmpdir):
     np.savetxt(tmpdir / "lengths.csv", length, delimiter=",")
 
     p_file = Pod.pod_from_files(
-        Pod, tmpdir / "grain.csv", tmpdir / "lengths.csv", "TestName"
+        tmpdir / "grain.csv", tmpdir / "lengths.csv", "TestName"
     )
 
     p_direct = Pod(grain_data, length[4:], length[1:4], "TestName")
