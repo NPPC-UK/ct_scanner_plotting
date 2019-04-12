@@ -11,7 +11,7 @@ from scipy.stats.stats import pearsonr
 
 
 def plot_sorted_property(containers, prop_fn, property_name="Property"):
-    prop = prop_fn(containers)
+    prop = [prop_fn(con) for con in containers]
     names = [con.name for con in containers]
     median_prop = median(prop)
 
@@ -132,8 +132,8 @@ def plot_property_vs_property(
     x_prop_name="X Prop",
     y_prop_name="Y Prop",
 ):
-    x_prop = x_prop_fn(containers)
-    y_prop = y_prop_fn(containers)
+    x_prop = [x_prop_fn(con) for con in containers]
+    y_prop = [y_prop_fn(con) for con in containers]
     left, width = 0.1, 0.65
     bottom, height = 0.35, 0.60
 
@@ -158,7 +158,7 @@ def plot_property_vs_property(
 def plot_pearson_correlations(containers, props_fns, prop_names):
     props = []
     for fn in props_fns:
-        props.append(fn(containers))
+        props.append([fn(con) for con in containers])
 
     correlations = np.zeros((len(props), len(props)))
     p_values = np.ones((len(props), len(props)))

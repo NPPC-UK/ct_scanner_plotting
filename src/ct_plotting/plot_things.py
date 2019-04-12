@@ -149,69 +149,51 @@ def main():
     plants = Plant.group_from_pods(pods, lambda name: name[:-3])
 
     plot_sorted_property(
-        pods,
-        lambda pods: [pod.mean_volume() for pod in pods],
-        property_name="mean volume of grains",
+        pods, Pod.mean_volume, property_name="mean volume of grains"
     )
 
-    plot_sorted_property(
-        pods,
-        lambda pods: [pod.n_grains() for pod in pods],
-        property_name="number of grains",
-    )
+    plot_sorted_property(pods, Pod.n_grains, property_name="number of grains")
 
     plot_sorted_property(
         plants,
-        lambda plants: [plant.mean_volume() for plant in plants],
+        Plant.mean_volume,
         property_name="grouped mean volume of grains",
     )
 
     plot_sorted_property(
-        plants,
-        lambda plants: [plant.n_grains() for plant in plants],
-        property_name="grouped number of grains",
+        plants, Plant.n_grains, property_name="grouped number of grains"
     )
 
     plot_sorted_property(
-        pods,
-        lambda pods: [pod.mean_sphericity() for pod in pods],
-        property_name="mean sphericity of grains",
+        pods, Pod.mean_sphericity, property_name="mean sphericity of grains"
     )
 
-    plot_sorted_property(
-        pods,
-        lambda pods: [pod.length() for pod in pods],
-        property_name="length of pod",
+    plot_sorted_property(pods, Pod.length, property_name="length of pod")
+
+    plot_property_vs_property(
+        pods, Pod.length, Pod.n_grains, "length of pod", "number of grains"
     )
 
     plot_property_vs_property(
         pods,
-        lambda pods: [pod.length() for pod in pods],
-        lambda pods: [pod.n_grains() for pod in pods],
-        "length of pod",
-        "number of grains",
-    )
-
-    plot_property_vs_property(
-        pods,
-        lambda pods: [pod.length() for pod in pods],
-        lambda pods: [pod.mean_volume() for pod in pods],
+        Pod.length,
+        Pod.mean_volume,
         "length of pod",
         "mean volume of grains",
     )
 
     plot_property_vs_property(
         pods,
-        lambda pods: [pod.n_grains() for pod in pods],
-        lambda pods: [pod.mean_volume() for pod in pods],
+        Pod.n_grains,
+        Pod.mean_volume,
         "number of grains",
         "mean volume of grains",
     )
 
     plot_property_vs_property(
         pods,
-        lambda pods: [pod.mean_volume() for pod in pods],
-        lambda pods: [pod.mean_sphericity() for pod in pods],
+        Pod.mean_volume,
+        Pod.mean_sphericity,
         "mean volume of grains",
         "mean sphericities",
     )
@@ -219,11 +201,11 @@ def main():
     plot_pearson_correlations(
         pods,
         [
-            lambda pods: [pod.length() for pod in pods],
-            lambda pods: [pod.n_grains() for pod in pods],
-            lambda pods: [pod.mean_volume() for pod in pods],
-            lambda pods: [pod.mean_sphericity() for pod in pods],
-            lambda pods: [pod.mean_surface_area() for pod in pods],
+            Pod.length,
+            Pod.n_grains,
+            Pod.mean_volume,
+            Pod.mean_sphericity,
+            Pod.mean_surface_area,
         ],
         ["length", "n_grains", "volumes", "sphericities", "surface_areas"],
     )
