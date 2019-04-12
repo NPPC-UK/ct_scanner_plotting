@@ -147,7 +147,7 @@ def get_data(meta_file, base_path):
         except IndexError:
             continue
 
-        pod = Pod.pod_from_files(Pod, grains_file, length_file, scan[0])
+        pod = Pod.pod_from_files(grains_file, length_file, scan[0])
 
         pods.append(pod)
 
