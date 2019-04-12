@@ -120,6 +120,23 @@ class Pod(Grain_Container):
 
 
 class Plant(Grain_Container):
+    @classmethod
+    def group_from_pods(cls, pods, name_fn):
+        plants = []
+        grouped = {}
+
+        for pod in pods:
+            name = name_fn(pod.name)
+            if name not in grouped:
+                grouped[name] = [pod]
+            else:
+                grouped[name].append(pod)
+
+        for name, pod_group in grouped.items():
+            plants.append(cls(pod_group, name))
+
+        return plants
+
     def __init__(self, pods, name):
         self.pods = pods
         self.name = name

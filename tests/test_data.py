@@ -545,3 +545,26 @@ def test_plant_correctly_calculates_list_of_properties():
     assert plant.mean_sphericity() == pod.mean_sphericity()
     assert plant.mean_volume() == pod.mean_volume()
     assert plant.mean_surface_area() == pod.mean_surface_area()
+
+
+def test_group_from_pods_correctly_groups_by_similar_name():
+    group1 = []
+    group2 = []
+    group3 = []
+    for i in range(0, 10):
+        group1.append(
+            Pod(grain_data, length[4:], length[1:4], "Group1Pod_{}".format(i))
+        )
+        group2.append(
+            Pod(grain_data, length[4:], length[1:4], "Group2Pod_{}".format(i))
+        )
+        group3.append(
+            Pod(grain_data, length[4:], length[1:4], "Group3Pod_{}".format(i))
+        )
+
+    plants = Plant.group_from_pods(
+        group1 + group2 + group3, lambda name: name[:-3]
+    )
+
+    for plant in plants:
+        assert len(plant.pods) == 10
