@@ -13,22 +13,6 @@ from ct_plotting.plots import (
 from ct_plotting.data import Pod, Plant
 
 
-def group_data(pods):
-    grouped = {}
-
-    for pod in pods:
-        if pod.name[:-3] not in grouped:
-            grouped[pod.name[:-3]] = [pod]
-        else:
-            grouped[pod.name[:-3]].append(pod)
-
-    plants = []
-    for name, pods in grouped.items():
-        plants.append(Plant(pods, name))
-
-    return plants
-
-
 def merge_grains(grains):
     """Return a grain corresponding to the 'sum' of an arbitrary number of
     other grains.
@@ -162,7 +146,7 @@ def main():
         ),
         Path("/mnt/mass/max/BR09_CTdata/mnt/mass/scratch/br09_data"),
     )
-    plants = group_data(pods)
+    plants = Plant.group_from_pods(pods, lambda name: name[:-3])
 
     plot_sorted_property(
         pods,
