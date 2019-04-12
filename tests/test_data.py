@@ -540,7 +540,7 @@ def test_plant_correctly_calculates_list_of_properties():
         for i in range(0, 10)
     ]
 
-    plant = Plant(pods)
+    plant = Plant(pods, "TestPlant")
     assert True
     assert plant.mean_sphericity() == pod.mean_sphericity()
     assert plant.mean_volume() == pod.mean_volume()

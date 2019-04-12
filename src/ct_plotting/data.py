@@ -113,8 +113,9 @@ class Pod(Grain_Container):
 
 
 class Plant(Grain_Container):
-    def __init__(self, pods):
+    def __init__(self, pods, name):
         self.pods = pods
+        self.name = name
 
     def volumes(self):
         return _list_of_props(self.pods, Pod.volumes)
