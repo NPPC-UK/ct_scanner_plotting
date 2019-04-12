@@ -4,6 +4,14 @@ import math
 import numpy as np
 
 
+def _list_of_props(containers, fn):
+    ls = []
+    for container in containers:
+        ls += fn(container)
+
+    return ls
+
+
 class Grain_Container:
     """Abstract base class that generalises between Pods, Treatments and
     Genotypes.
@@ -98,21 +106,14 @@ class Plant(Grain_Container):
     def __init__(self, pods):
         self.pods = pods
 
-    def _list_of_props(self, prop):
-        ls = []
-        for pod in self.pods:
-            ls += prop(pod)
-
-        return ls
-
     def volumes(self):
-        return self._list_of_props(Pod.volumes)
+        return _list_of_props(self.pods, Pod.volumes)
 
     def sphericities(self):
-        return self._list_of_props(Pod.sphericities)
+        return _list_of_props(self.pods, Pod.sphericities)
 
     def surface_areas(self):
-        return self._list_of_props(Pod.surface_areas)
+        return _list_of_props(self.pods, Pod.surface_areas)
 
 
 class Grain:
