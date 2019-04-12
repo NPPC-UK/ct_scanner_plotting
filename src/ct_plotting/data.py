@@ -84,6 +84,9 @@ class Pod(Grain_Container):
             if not near_ends
         ]
 
+    def n_grains(self):
+        return len(self.grains)
+
     def _near_ends(self):
         near_ends = []
         for idx, grain in enumerate(self.grains):
@@ -125,6 +128,9 @@ class Plant(Grain_Container):
 
     def surface_areas(self):
         return _list_of_props(self.pods, Pod.surface_areas)
+
+    def n_grains(self):
+        return sum([pod.n_grains() for pod in self.pods])
 
 
 class Grain:
