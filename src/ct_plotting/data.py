@@ -118,6 +118,18 @@ class Pod(Grain_Container):
             and self.bottom == other.bottom
         )
 
+    def __str__(self):
+        return ", ".join(
+            (
+                self.name,
+                (self.top - self.bottom).norm(),
+                self.n_grains(),
+                self.mean_sphericity(),
+                self.mean_volume(),
+                self.mean_surface_area(),
+            )
+        )
+
 
 class Plant(Grain_Container):
     @classmethod
