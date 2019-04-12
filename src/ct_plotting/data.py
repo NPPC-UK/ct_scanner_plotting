@@ -119,15 +119,14 @@ class Pod(Grain_Container):
         )
 
     def __str__(self):
-        return ", ".join(
-            (
-                self.name,
-                (self.top - self.bottom).norm(),
-                self.n_grains(),
-                self.mean_sphericity(),
-                self.mean_volume(),
-                self.mean_surface_area(),
-            )
+        format_str = "{}, {}, {}, {}, {}, {}"
+        return format_str.format(
+            self.name,
+            (self.top - self.bottom).norm(),
+            self.n_grains(),
+            self.mean_sphericity(),
+            self.mean_volume(),
+            self.mean_surface_area(),
         )
 
 
