@@ -146,6 +146,11 @@ def main():
         ),
         Path("/mnt/mass/max/BR09_CTdata/mnt/mass/scratch/br09_data"),
     )
+
+    print("Name, Length, Number, Sphericity, Volume, Surface Area")
+    for pod in pods:
+        print(str(pod))
+
     plants = Plant.group_from_pods(pods, lambda name: name[:-3])
 
     plot_sorted_property(
