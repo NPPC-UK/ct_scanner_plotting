@@ -10,7 +10,9 @@ from scipy.stats import gaussian_kde
 from scipy.stats.stats import pearsonr
 
 
-def plot_sorted_property(prop, names, property_name="Property"):
+def plot_sorted_property(containers, prop_fn, property_name="Property"):
+    prop = prop_fn(containers)
+    names = [con.name for con in containers]
     median_prop = median(prop)
 
     sorted_data = sorted(zip(prop, names), key=lambda x: x[0])
@@ -82,7 +84,7 @@ def plot_sorted_property(prop, names, property_name="Property"):
     axHist.set_ylim(axScatter.get_ylim())
     axHist_xlim = axHist.get_xlim()
 
-    axSmoothedHist.set_xlim([axHist_xlim()[0], axSmoothedHist.get_xlim()[1]])
+    axSmoothedHist.set_xlim([axHist_xlim[0], axHist_xlim[1]])
 
     axDeriv.plot(derivative_prop, color="black", linewidth=0.8)
 
@@ -124,8 +126,14 @@ def plot_sorted_property(prop, names, property_name="Property"):
 
 
 def plot_property_vs_property(
-    x_prop, y_prop, names, x_prop_name="X Prop", y_prop_name="Y Prop"
+    containers,
+    x_prop_fn,
+    y_prop_fn,
+    x_prop_name="X Prop",
+    y_prop_name="Y Prop",
 ):
+    x_prop = x_prop_fn(containers)
+    y_prop = y_prop_fn(containers)
     left, width = 0.1, 0.65
     bottom, height = 0.35, 0.60
 
@@ -147,7 +155,11 @@ def plot_property_vs_property(
     fig.clf()
 
 
-def plot_pearson_correlations(props, prop_names):
+def plot_pearson_correlations(containers, props_fns, prop_names):
+    props = []
+    for fn in props_fns:
+        props.append(fn(containers))
+
     correlations = np.zeros((len(props), len(props)))
     p_values = np.ones((len(props), len(props)))
 

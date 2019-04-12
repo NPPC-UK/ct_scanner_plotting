@@ -1,6 +1,4 @@
 from pathlib import Path
-from math import pi
-from statistics import mean
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -12,39 +10,23 @@ from ct_plotting.plots import (
     plot_pearson_correlations,
 )
 
-
-def get_nth_property(n, data):
-    props = []
-    names = []
-    for i, v in data.items():
-        props.append(v[0][:, n])
-        names.append(i)
-
-    return (props, names)
+from ct_plotting.data import Pod, Plant
 
 
-def get_properties(ns, data):
-    d = []
-    for i, v in data.items():
-        name_item = (i,)
-        for n in ns:
-            name_item += (v[0][:, n],)
+def group_data(pods):
+    grouped = {}
 
-        d.append(name_item)
-
-    return d
-
-
-def group_data(data, names):
-    grouped_data = {}
-
-    for d, name in zip(data, names):
-        if name[:-3] not in grouped_data:
-            grouped_data[name[:-3]] = list(d)
+    for pod in pods:
+        if pod.name[:-3] not in grouped:
+            grouped[pod.name[:-3]] = [pod]
         else:
-            grouped_data[name[:-3]] += list(d)
+            grouped[pod.name[:-3]].append(pod)
 
-    return grouped_data
+    plants = []
+    for name, pods in grouped.items():
+        plants.append(Plant(pods, name))
+
+    return plants
 
 
 def merge_grains(grains):
@@ -142,12 +124,12 @@ def get_data(meta_file, base_path):
     meta_data = np.genfromtxt(
         meta_file,
         delimiter="\t",
-        usecols=[0, 4],
+        usecols=[0, 4, 6],
         dtype=meta_type,
         skip_header=1,
     )
 
-    data = {}
+    pods = []
 
     for scan in meta_data:
         csv_dir = base_path / scan[1]
@@ -165,106 +147,100 @@ def get_data(meta_file, base_path):
         except IndexError:
             continue
 
-        length = np.genfromtxt(length_file, delimiter=",", skip_header=0)
-        grains = np.genfromtxt(grains_file, delimiter=",", skip_header=1)
+        pod = Pod.pod_from_files(Pod, grains_file, length_file, scan[0])
 
-        filtered_grains = filter_grains(grains, length[1:4], length[4:])
+        pods.append(pod)
 
-        data[scan[0]] = (grains, length[0], filtered_grains)
-
-    return data
+    return pods
 
 
 def main():
-    data = get_data(
+    pods = get_data(
         Path(
             "/mnt/mass/max/BR09_CTdata/mnt/mass/scratch/br09_data/"
             "BR9_scan_list.csv"
         ),
         Path("/mnt/mass/max/BR09_CTdata/mnt/mass/scratch/br09_data"),
     )
+    plants = group_data(pods)
 
-    volumes, names = get_nth_property(5, data)
     plot_sorted_property(
-        [mean(volume) if len(volume) > 0 else -1 for volume in volumes],
-        names,
+        pods,
+        lambda pods: [pod.mean_volume() for pod in pods],
         property_name="mean volume of grains",
     )
 
     plot_sorted_property(
-        [
-            mean(((3 / (4 * pi)) * volume) ** (1.0 / 3))
-            if len(volume) > 0
-            else -1
-            for volume in volumes
-        ],
-        names,
-        property_name="mean adjusted radius of grains",
+        pods,
+        lambda pods: [pod.n_grains() for pod in pods],
+        property_name="number of grains",
     )
 
-    n_grains = [len(grains) for grains in volumes]
-    plot_sorted_property(n_grains, names, property_name="number of grains")
-
-    grouped_volumes = group_data(volumes, names).items()
-
-    names = [name for name, volume in grouped_volumes]
-    volumes = [volume for name, volume in grouped_volumes]
-
     plot_sorted_property(
-        [mean(volume) if len(volume) > 0 else -1 for volume in volumes],
-        names,
+        plants,
+        lambda plants: [plant.mean_volume() for plant in plants],
         property_name="grouped mean volume of grains",
     )
 
-    n_grains = [len(grains) for grains in volumes]
     plot_sorted_property(
-        n_grains, names, property_name="grouped number of grains"
+        plants,
+        lambda plants: [plant.n_grains() for plant in plants],
+        property_name="grouped number of grains",
     )
-
-    names, sphericities, lengths, n_grains, vols, surface_areas = (
-        [],
-        [],
-        [],
-        [],
-        [],
-        [],
-    )
-    for name, (np_data, length) in data.items():
-        names.append(name)
-
-        ideal_surface_area = pi ** (1.0 / 3) * (6 * np_data[:, 5]) ** (2.0 / 3)
-        sphericity = np.mean(np.divide(ideal_surface_area, np_data[:, 7]))
-        sphericities.append(sphericity)
-
-        lengths.append(length)
-
-        n_grains.append(len(np_data[:, 0]))
-        vols.append(np.mean(np_data[:, 5]))
-        surface_areas.append(np.mean(np_data[:, 7]))
 
     plot_sorted_property(
-        sphericities, names, property_name="mean sphericity of grains"
-    )
-    plot_sorted_property(lengths, names, property_name="length of pod")
-
-    plot_property_vs_property(
-        lengths, n_grains, names, "length of pod", "number of grains"
+        pods,
+        lambda pods: [pod.mean_sphericity() for pod in pods],
+        property_name="mean sphericity of grains",
     )
 
-    plot_property_vs_property(
-        lengths, vols, names, "length of pod", "mean volume of grains"
-    )
-
-    plot_property_vs_property(
-        n_grains, vols, names, "number of grains", "mean volume of grains"
+    plot_sorted_property(
+        pods,
+        lambda pods: [pod.length() for pod in pods],
+        property_name="length of pod",
     )
 
     plot_property_vs_property(
-        vols, sphericities, names, "mean volume of grains", "mean sphericities"
+        pods,
+        lambda pods: [pod.length() for pod in pods],
+        lambda pods: [pod.n_grains() for pod in pods],
+        "length of pod",
+        "number of grains",
+    )
+
+    plot_property_vs_property(
+        pods,
+        lambda pods: [pod.length() for pod in pods],
+        lambda pods: [pod.mean_volume() for pod in pods],
+        "length of pod",
+        "mean volume of grains",
+    )
+
+    plot_property_vs_property(
+        pods,
+        lambda pods: [pod.n_grains() for pod in pods],
+        lambda pods: [pod.mean_volume() for pod in pods],
+        "number of grains",
+        "mean volume of grains",
+    )
+
+    plot_property_vs_property(
+        pods,
+        lambda pods: [pod.mean_volume() for pod in pods],
+        lambda pods: [pod.mean_sphericity() for pod in pods],
+        "mean volume of grains",
+        "mean sphericities",
     )
 
     plot_pearson_correlations(
-        [lengths, n_grains, vols, sphericities, surface_areas],
+        pods,
+        [
+            lambda pods: [pod.length() for pod in pods],
+            lambda pods: [pod.n_grains() for pod in pods],
+            lambda pods: [pod.mean_volume() for pod in pods],
+            lambda pods: [pod.mean_sphericity() for pod in pods],
+            lambda pods: [pod.mean_surface_area() for pod in pods],
+        ],
         ["length", "n_grains", "volumes", "sphericities", "surface_areas"],
     )
 
