@@ -19,6 +19,7 @@ class Grain_Container:
     All of these things contain a set of Grains, and all of them can
     calculate mean properties of the grains.
     """
+
     def mean_sphericity(self):
         return mean(self.sphericities())
 
@@ -48,8 +49,10 @@ class Pod(Grain_Container):
         for grain in grains:
             g_obj = Grain(grain)
 
-            if (g_obj.position.z < self.bottom.z or
-               g_obj.position.z > self.top.z):
+            if (
+                g_obj.position.z < self.bottom.z
+                or g_obj.position.z > self.top.z
+            ):
                 raise ValueError(
                     "Grain {} is outside pod limits".format(g_obj)
                 )
@@ -57,12 +60,12 @@ class Pod(Grain_Container):
             self.grains.append(g_obj)
 
     def pod_from_files(cls, grains_file, length_file, name):
-        length = np.genfromtxt(length_file, delimiter=',', skip_header=0)
+        length = np.genfromtxt(length_file, delimiter=",", skip_header=0)
         return cls(
-            np.genfromtxt(grains_file, delimiter=',', skip_header=1),
+            np.genfromtxt(grains_file, delimiter=",", skip_header=1),
             length[4:],
             length[1:4],
-            name
+            name,
         )
 
     def volumes(self):
@@ -75,8 +78,11 @@ class Pod(Grain_Container):
         return [g.sphericity() for g in self.grains]
 
     def filter(self):
-        self.grains = [grain for grain, near_ends in
-                       zip(self.grains, self._near_ends()) if not near_ends]
+        self.grains = [
+            grain
+            for grain, near_ends in zip(self.grains, self._near_ends())
+            if not near_ends
+        ]
 
     def _near_ends(self):
         near_ends = []
@@ -93,13 +99,17 @@ class Pod(Grain_Container):
             return False
 
         grains_equal = all(
-            [s_grain == o_grain for s_grain, o_grain in
-             zip(self.grains, other.grains)]
+            [
+                s_grain == o_grain
+                for s_grain, o_grain in zip(self.grains, other.grains)
+            ]
         )
 
-        return (grains_equal and
-                self.top == other.top and
-                self.bottom == other.bottom)
+        return (
+            grains_equal
+            and self.top == other.top
+            and self.bottom == other.bottom
+        )
 
 
 class Plant(Grain_Container):
@@ -123,33 +133,29 @@ class Grain:
         self.surface_area = grain[7]
 
     def sphericity(self):
-        return (math.pi**(1./3) * (6*self.volume)**(2./3))/self.surface_area
+        return (
+            math.pi ** (1.0 / 3) * (6 * self.volume) ** (2.0 / 3)
+        ) / self.surface_area
 
     def __eq__(self, other):
-        return (self.position == other.position and
-                self.volume == other.volume and
-                self.surface_area == other.surface_area)
+        return (
+            self.position == other.position
+            and self.volume == other.volume
+            and self.surface_area == other.surface_area
+        )
 
 
-class Point():
+class Point:
     def __init__(self, x, y, z):
         self.x = x
         self.y = y
         self.z = z
 
     def __add__(self, other):
-        return type(self)(
-            self.x + other.x,
-            self.y + other.y,
-            self.z + other.z
-        )
+        return type(self)(self.x + other.x, self.y + other.y, self.z + other.z)
 
     def __sub__(self, other):
-        return type(self)(
-            self.x - other.x,
-            self.y - other.y,
-            self.z - other.z
-        )
+        return type(self)(self.x - other.x, self.y - other.y, self.z - other.z)
 
     def __repr__(self):
         return "Point({}, {}, {})".format(self.x, self.y, self.z)
@@ -158,6 +164,4 @@ class Point():
         return self.x == other.x and self.y == other.y and self.z == other.z
 
     def norm(self):
-        return math.sqrt(
-            self.x**2 + self.y**2 + self.z**2
-        )
+        return math.sqrt(self.x ** 2 + self.y ** 2 + self.z ** 2)
