@@ -1,4 +1,5 @@
 from pathlib import Path
+import argparse
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -138,19 +139,7 @@ def get_data(meta_file, base_path):
     return pods
 
 
-def main():
-    pods = get_data(
-        Path(
-            "/mnt/mass/max/BR09_CTdata/mnt/mass/scratch/br09_data/"
-            "BR9_scan_list.csv"
-        ),
-        Path("/mnt/mass/max/BR09_CTdata/mnt/mass/scratch/br09_data"),
-    )
-
-    print("Name, Length, Number, Sphericity, Volume, Surface Area")
-    for pod in pods:
-        print(str(pod))
-
+def plot(pods):
     plants = Plant.group_from_pods(pods, lambda name: name[:-3])
 
     plot_sorted_property(
@@ -216,6 +205,24 @@ def main():
     )
 
 
+def main(args):
+    meta_file = (
+        args.meta_file
+        if args.meta_file.is_absolute()
+        else args.working_dir / args.meta_file
+    )
+
+    pods = get_data(meta_file, args.working_dir)
+
+    if not args.no_plotting:
+        plot(pods)
+
+    if args.print_stats:
+        print("Name, Length, Number, Sphericity, Volume, Surface Area")
+        for pod in pods:
+            print(str(pod))
+
+
 def plot_distances():
     all_data = get_data(
         Path(
@@ -271,5 +278,54 @@ def plot_distances():
     return grouped_distances
 
 
+def get_arguments():
+    parser = argparse.ArgumentParser(
+        description="A program to plot stats of microCT scans of Brassica pods"
+    )
+    parser.add_argument(
+        "-n",
+        "--no_plotting",
+        action="store_true",
+        help="do not plot any graphs",
+    )
+    parser.add_argument(
+        "-p",
+        "--print_stats",
+        action="store_true",
+        help="print stats about the brassica pods",
+    )
+    parser.add_argument(
+        "-d",
+        "--working_dir",
+        type=Path,
+        default=Path("./"),
+        metavar="DIR",
+        help="path to the working directory, uses the current "
+        "directory by default",
+    )
+    parser.add_argument(
+        "-o",
+        "--output_dir",
+        type=Path,
+        default=Path("./"),
+        metavar="DIR",
+        help="path to the output directory, uses the current "
+        "directory by default.  This is where the plots are "
+        "saved too.",
+    )
+    parser.add_argument(
+        "-m",
+        "--meta_file",
+        type=Path,
+        required=True,
+        metavar="FILE",
+        help="path to the file containing the meta data, relative "
+        "paths start from the WORKING_DIR",
+    )
+
+    return parser.parse_args()
+
+
 if __name__ == "__main__":
-    main()
+    args = get_arguments()
+    main(args)
