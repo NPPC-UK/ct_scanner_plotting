@@ -231,6 +231,17 @@ def plot(pods, outdir):
     )
 
     save(
+        plot_property_vs_property(
+            pods,
+            Pod.mean_surface_area,
+            Pod.mean_sphericity,
+            "mean surface area of grains",
+            "mean sphericities",
+        ),
+        "mean_surface_area_of_grains_vs_mean_sphericities",
+    )
+
+    save(
         plot_pearson_correlations(
             pods,
             [
