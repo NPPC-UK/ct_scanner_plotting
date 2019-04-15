@@ -9,9 +9,10 @@ from ct_plotting.plots import (
     plot_sorted_property,
     plot_property_vs_property,
     plot_pearson_correlations,
+    plot_bar_property,
 )
 
-from ct_plotting.data import Pod, Plant
+from ct_plotting.data import Pod, Plant, Genotype
 
 
 def merge_grains(grains):
@@ -140,11 +141,19 @@ def get_data(meta_file, base_path):
 
 
 def plot(pods, outdir):
-    plants = Plant.group_from_pods(pods, lambda name: name[:-3])
+    plants = Plant.group_from_pods(pods, lambda name: name[:-2])
+    genotypes = Genotype.group_from_plants(plants, lambda name: name[:-3])
 
     def save(fig, fname):
         fig.savefig(outdir / "plot_{}.svg".format(fname))
         fig.clf()
+
+    save(
+        plot_bar_property(
+            genotypes, Genotype.volumes, property_name="volumes of grains"
+        ),
+        "bar_volumes_of_grains",
+    )
 
     save(
         plot_sorted_property(
@@ -171,7 +180,9 @@ def plot(pods, outdir):
 
     save(
         plot_sorted_property(
-            plants, Plant.n_grains, property_name="grouped number of grains"
+            plants,
+            Plant.mean_n_grains,
+            property_name="grouped number of grains",
         ),
         "group_number_of_grains",
     )

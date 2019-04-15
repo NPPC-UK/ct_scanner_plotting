@@ -1,4 +1,4 @@
-from statistics import median
+from statistics import median, mean
 from itertools import combinations
 
 import matplotlib.pyplot as plt
@@ -8,6 +8,16 @@ import numpy as np
 
 from scipy.stats import gaussian_kde
 from scipy.stats.stats import pearsonr
+
+
+def plot_bar_property(containers, prop_fn, property_name="Property"):
+    prop = [mean(prop_fn(con)) for con in containers]
+    names = [con.name for con in containers]
+
+    fig = plt.figure(1, figsize=(16, 9))
+    axBar = fig.add_axes([0, 0, 1, 1])
+    axBar.bar(range(1, len(prop) + 1), prop, tick_label=names)
+    return fig
 
 
 def plot_sorted_property(containers, prop_fn, property_name="Property"):

@@ -38,6 +38,9 @@ class Grain_Container:
     def volumes(self):
         raise NotImplementedError()
 
+    def n_grains(self):
+        return len(self.grains)
+
 
 class Pod(Grain_Container):
     def __init__(self, grains, top, bottom, name):
@@ -162,7 +165,49 @@ class Plant(Grain_Container):
         return _list_of_props(self.pods, Pod.surface_areas)
 
     def n_grains(self):
-        return sum([pod.n_grains() for pod in self.pods])
+        n_grains = []
+        for pod in self.pods:
+            n_grains.append(pod.n_grains())
+
+        return n_grains
+
+    def mean_n_grains(self):
+        return mean(self.n_grains())
+
+
+class Genotype(Grain_Container):
+    @classmethod
+    def group_from_plants(cls, plants, name_fn):
+        genotypes = []
+        grouped = {}
+
+        for plant in plants:
+            name = name_fn(plant.name)
+            if name not in grouped:
+                grouped[name] = [plant]
+            else:
+                grouped[name].append(plant)
+
+        for name, plant_group in grouped.items():
+            genotypes.append(cls(plant_group, name))
+
+        return genotypes
+
+    def __init__(self, plants, name):
+        self.plants = plants
+        self.name = name
+
+    def sphericities(self):
+        return _list_of_props(self.plants, Plant.sphericities)
+
+    def surface_areas(self):
+        return _list_of_props(self.plants, Plant.surface_areas)
+
+    def volumes(self):
+        return _list_of_props(self.plants, Plant.volumes)
+
+    def n_grains(self):
+        return _list_of_props(self.plants, Plant.n_grains)
 
 
 class Grain:
