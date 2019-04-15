@@ -139,69 +139,110 @@ def get_data(meta_file, base_path):
     return pods
 
 
-def plot(pods):
+def plot(pods, outdir):
     plants = Plant.group_from_pods(pods, lambda name: name[:-3])
 
-    plot_sorted_property(
-        pods, Pod.mean_volume, property_name="mean volume of grains"
+    def save(fig, fname):
+        fig.savefig(outdir / "plot_{}.svg".format(fname))
+        fig.clf()
+
+    save(
+        plot_sorted_property(
+            pods, Pod.mean_volume, property_name="mean volume of grains"
+        ),
+        "mean_volume_of_grains",
     )
 
-    plot_sorted_property(pods, Pod.n_grains, property_name="number of grains")
-
-    plot_sorted_property(
-        plants,
-        Plant.mean_volume,
-        property_name="grouped mean volume of grains",
+    save(
+        plot_sorted_property(
+            pods, Pod.n_grains, property_name="number of grains"
+        ),
+        "number_of_grains",
     )
 
-    plot_sorted_property(
-        plants, Plant.n_grains, property_name="grouped number of grains"
+    save(
+        plot_sorted_property(
+            plants,
+            Plant.mean_volume,
+            property_name="grouped mean volume of grains",
+        ),
+        "grouped_mean_volume_of_grains",
     )
 
-    plot_sorted_property(
-        pods, Pod.mean_sphericity, property_name="mean sphericity of grains"
+    save(
+        plot_sorted_property(
+            plants, Plant.n_grains, property_name="grouped number of grains"
+        ),
+        "group_number_of_grains",
     )
 
-    plot_sorted_property(pods, Pod.length, property_name="length of pod")
-
-    plot_property_vs_property(
-        pods, Pod.length, Pod.n_grains, "length of pod", "number of grains"
+    save(
+        plot_sorted_property(
+            pods,
+            Pod.mean_sphericity,
+            property_name="mean sphericity of grains",
+        ),
+        "mean_sphericity_of_grains",
     )
 
-    plot_property_vs_property(
-        pods,
-        Pod.length,
-        Pod.mean_volume,
-        "length of pod",
-        "mean volume of grains",
+    save(
+        plot_sorted_property(pods, Pod.length, property_name="length of pod"),
+        "length_of_pod",
     )
 
-    plot_property_vs_property(
-        pods,
-        Pod.n_grains,
-        Pod.mean_volume,
-        "number of grains",
-        "mean volume of grains",
+    save(
+        plot_property_vs_property(
+            pods, Pod.length, Pod.n_grains, "length of pod", "number of grains"
+        ),
+        "length_of_pod_vs_number_of_grains",
     )
 
-    plot_property_vs_property(
-        pods,
-        Pod.mean_volume,
-        Pod.mean_sphericity,
-        "mean volume of grains",
-        "mean sphericities",
-    )
-
-    plot_pearson_correlations(
-        pods,
-        [
+    save(
+        plot_property_vs_property(
+            pods,
             Pod.length,
+            Pod.mean_volume,
+            "length of pod",
+            "mean volume of grains",
+        ),
+        "length_of_pod_vs_mean_volume_of_grains",
+    )
+
+    save(
+        plot_property_vs_property(
+            pods,
             Pod.n_grains,
             Pod.mean_volume,
+            "number of grains",
+            "mean volume of grains",
+        ),
+        "number_of_grains_vs_mean_volume_of_grains",
+    )
+
+    save(
+        plot_property_vs_property(
+            pods,
+            Pod.mean_volume,
             Pod.mean_sphericity,
-            Pod.mean_surface_area,
-        ],
-        ["length", "n_grains", "volumes", "sphericities", "surface_areas"],
+            "mean volume of grains",
+            "mean sphericities",
+        ),
+        "mean_volume_of_grains_vs_mean_sphericities",
+    )
+
+    save(
+        plot_pearson_correlations(
+            pods,
+            [
+                Pod.length,
+                Pod.n_grains,
+                Pod.mean_volume,
+                Pod.mean_sphericity,
+                Pod.mean_surface_area,
+            ],
+            ["length", "n_grains", "volumes", "sphericities", "surface_areas"],
+        ),
+        "correlations",
     )
 
 
@@ -215,7 +256,7 @@ def main(args):
     pods = get_data(meta_file, args.working_dir)
 
     if not args.no_plotting:
-        plot(pods)
+        plot(pods, args.output_dir)
 
     if args.print_stats:
         print("Name, Length, Number, Sphericity, Volume, Surface Area")

@@ -121,8 +121,7 @@ def plot_sorted_property(containers, prop_fn, property_name="Property"):
     axHist.legend(loc="upper right")
     axSmoothedHist.legend(loc="lower right")
 
-    fig.savefig("plot_{}.svg".format(property_name.replace(" ", "_")))
-    fig.clf()
+    return fig
 
 
 def plot_property_vs_property(
@@ -147,12 +146,7 @@ def plot_property_vs_property(
     axScatter.scatter(x_prop, y_prop, marker="+", s=50)
     axScatter.set_title("{} vs {}".format(x_prop_name, y_prop_name))
 
-    fig.savefig(
-        "plot_{}_vs_{}.svg".format(
-            x_prop_name.replace(" ", "_"), y_prop_name.replace(" ", "_")
-        )
-    )
-    fig.clf()
+    return fig
 
 
 def plot_pearson_correlations(containers, props_fns, prop_names):
@@ -201,5 +195,4 @@ def plot_pearson_correlations(containers, props_fns, prop_names):
                 color="w",
             )
 
-    fig.savefig("plot_correlations.svg")
-    fig.clf()
+    return fig
