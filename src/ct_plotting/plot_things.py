@@ -156,6 +156,13 @@ def plot(pods, outdir):
     )
 
     save(
+        plot_bar_property(
+            genotypes, Genotype.n_grains, property_name="number of grains"
+        ),
+        "bar_number_of_grains",
+    )
+
+    save(
         plot_sorted_property(
             pods, Pod.mean_volume, property_name="mean volume of grains"
         ),
