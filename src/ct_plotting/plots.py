@@ -1,4 +1,4 @@
-from statistics import median, mean
+from statistics import median
 from itertools import combinations
 
 import matplotlib.pyplot as plt
@@ -11,12 +11,31 @@ from scipy.stats.stats import pearsonr
 
 
 def plot_bar_property(containers, prop_fn, property_name="Property"):
-    prop = [mean(prop_fn(con)) for con in containers]
+    prop = [prop_fn(con) for con in containers]
     names = [con.name for con in containers]
 
-    fig = plt.figure(1, figsize=(16, 9))
-    axBar = fig.add_axes([0, 0, 1, 1])
-    axBar.bar(range(1, len(prop) + 1), prop, tick_label=names)
+    fig = plt.figure(1, figsize=(16, 5))
+    axBar = fig.add_axes([0.05, 0.15, 0.949, 0.63], title=property_name)
+    axBar.boxplot(
+        prop, bootstrap=1000, whis=3, flierprops=dict(marker=".", markersize=1)
+    )
+
+    axBar_top = axBar.twiny()
+
+    axBar.set_xticks(range(1, len(names) + 1, 2))
+    axBar.set_xticklabels(names[::2], rotation=30, horizontalalignment="right")
+
+    axBar_top.set_xlim(axBar.get_xlim())
+    axBar_top.set_xticks(range(2, len(names) + 2, 2))
+    axBar_top.set_xticklabels(
+        names[1::2], rotation=-30, horizontalalignment="right"
+    )
+
+    for i in range(1, len(names)):
+        axBar.axvline(
+            i + 0.5, color="black", linewidth=1, dashes=(0.05, 0.95), alpha=0.8
+        )
+
     return fig
 
 
