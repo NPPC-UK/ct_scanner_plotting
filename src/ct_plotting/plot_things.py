@@ -18,19 +18,21 @@ from ct_plotting.data import Pod, Plant, Genotype
 available_plots = {
     0: "Boxplot of grain volumes grouped by genotype",
     1: "Boxplot of number of grains grouped by genotype",
-    2: "Sorted pod mean of grain volume",
-    3: "Sorted number of grains in pods",
-    4: "Sorted plant mean of grain volume",
-    5: "Sorted number of grains in plants",
-    6: "Sorted pod mean of grain sphericities",
-    7: "Sorted pod length",
-    8: "Number of grains against pod length",
-    9: "Pod length against pod mean volume of grains",
-    10: "Number of grains against pod mean volume of grains",
-    11: "Pod mean volume of grains against pod mean sphericity of grains",
-    12: "Pod mean surface area of grains against pod mean sphericities of "
+    2: "Boxplot of sphericities grouped by genotype",
+    3: "Boxplot of surface areas grouped by genotype",
+    4: "Sorted pod mean of grain volume",
+    5: "Sorted number of grains in pods",
+    6: "Sorted plant mean of grain volume",
+    7: "Sorted number of grains in plants",
+    8: "Sorted pod mean of grain sphericities",
+    9: "Sorted pod length",
+    10: "Number of grains against pod length",
+    11: "Pod length against pod mean volume of grains",
+    12: "Number of grains against pod mean volume of grains",
+    13: "Pod mean volume of grains against pod mean sphericity of grains",
+    14: "Pod mean surface area of grains against pod mean sphericities of "
     "grains",
-    13: "Correlation matrix of all the calculable grain properties",
+    15: "Correlation matrix of all the calculable grain properties",
 }
 
 
@@ -183,19 +185,37 @@ def plot(pods, outdir, plot):
         )
     elif plot == 2:
         save(
+            plot_bar_property(
+                genotypes,
+                Genotype.sphericities,
+                property_name="sphericities of grains",
+            ),
+            "bar_sphericities_of_grains",
+        )
+    elif plot == 3:
+        save(
+            plot_bar_property(
+                genotypes,
+                Genotype.surface_areas,
+                property_name="surface area of grains",
+            ),
+            "bar_surface_area_of_grains",
+        )
+    elif plot == 4:
+        save(
             plot_sorted_property(
                 pods, Pod.mean_volume, property_name="mean volume of grains"
             ),
             "mean_volume_of_grains",
         )
-    elif plot == 3:
+    elif plot == 5:
         save(
             plot_sorted_property(
                 pods, Pod.n_grains, property_name="number of grains"
             ),
             "number_of_grains",
         )
-    elif plot == 4:
+    elif plot == 6:
         save(
             plot_sorted_property(
                 plants,
@@ -204,7 +224,7 @@ def plot(pods, outdir, plot):
             ),
             "grouped_mean_volume_of_grains",
         )
-    elif plot == 5:
+    elif plot == 7:
         save(
             plot_sorted_property(
                 plants,
@@ -213,7 +233,7 @@ def plot(pods, outdir, plot):
             ),
             "group_number_of_grains",
         )
-    elif plot == 6:
+    elif plot == 8:
         save(
             plot_sorted_property(
                 pods,
@@ -222,14 +242,14 @@ def plot(pods, outdir, plot):
             ),
             "mean_sphericity_of_grains",
         )
-    elif plot == 7:
+    elif plot == 9:
         save(
             plot_sorted_property(
                 pods, Pod.length, property_name="length of pod"
             ),
             "length_of_pod",
         )
-    elif plot == 8:
+    elif plot == 10:
         save(
             plot_property_vs_property(
                 pods,
@@ -240,7 +260,7 @@ def plot(pods, outdir, plot):
             ),
             "length_of_pod_vs_number_of_grains",
         )
-    elif plot == 9:
+    elif plot == 11:
         save(
             plot_property_vs_property(
                 pods,
@@ -251,7 +271,7 @@ def plot(pods, outdir, plot):
             ),
             "length_of_pod_vs_mean_volume_of_grains",
         )
-    elif plot == 10:
+    elif plot == 12:
         save(
             plot_property_vs_property(
                 pods,
@@ -262,7 +282,7 @@ def plot(pods, outdir, plot):
             ),
             "number_of_grains_vs_mean_volume_of_grains",
         )
-    elif plot == 11:
+    elif plot == 13:
         save(
             plot_property_vs_property(
                 pods,
@@ -273,7 +293,7 @@ def plot(pods, outdir, plot):
             ),
             "mean_volume_of_grains_vs_mean_sphericities",
         )
-    elif plot == 12:
+    elif plot == 14:
         save(
             plot_property_vs_property(
                 pods,
@@ -284,7 +304,7 @@ def plot(pods, outdir, plot):
             ),
             "mean_surface_area_of_grains_vs_mean_sphericities",
         )
-    elif plot == 13:
+    elif plot == 15:
         save(
             plot_pearson_correlations(
                 pods,
