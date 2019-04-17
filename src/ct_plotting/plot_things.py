@@ -325,8 +325,6 @@ def plot(pods, outdir, plot):
             ),
             "correlations",
         )
-    else:
-        print("Plot {} does not exist.".format(plot))
 
 
 def main(args):
@@ -424,6 +422,7 @@ def get_arguments():
         action="append",
         nargs="+",
         default=[[]],
+        choices=available_plots,
         type=int,
         help="select which plots to plot",
     )
