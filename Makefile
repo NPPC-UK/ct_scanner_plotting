@@ -9,6 +9,7 @@ test: install
 
 clean:
 	rm -rf out
+	*.svg
 
 install: src/ct_plotting/*.py
 	./venv/bin/python ./setup.py install > /dev/null
