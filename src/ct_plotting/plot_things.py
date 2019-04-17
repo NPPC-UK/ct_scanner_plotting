@@ -15,6 +15,25 @@ from ct_plotting.plots import (
 from ct_plotting.data import Pod, Plant, Genotype
 
 
+available_plots = {
+    0: "Boxplot of grain volumes grouped by genotype",
+    1: "Boxplot of number of grains grouped by genotype",
+    2: "Sorted pod mean of grain volume",
+    3: "Sorted number of grains in pods",
+    4: "Sorted plant mean of grain volume",
+    5: "Sorted number of grains in plants",
+    6: "Sorted pod mean of grain sphericities",
+    7: "Sorted pod length",
+    8: "Number of grains against pod length",
+    9: "Pod length against pod mean volume of grains",
+    10: "Number of grains against pod mean volume of grains",
+    11: "Pod mean volume of grains against pod mean sphericity of grains",
+    12: "Pod mean surface area of grains against pod mean sphericities of "
+    "grains",
+    13: "Correlation matrix of all the calculable grain properties",
+}
+
+
 def merge_grains(grains):
     """Return a grain corresponding to the 'sum' of an arbitrary number of
     other grains.
@@ -140,7 +159,7 @@ def get_data(meta_file, base_path):
     return pods
 
 
-def plot(pods, outdir):
+def plot(pods, outdir, plot):
     plants = Plant.group_from_pods(pods, lambda name: name[:-2])
     genotypes = Genotype.group_from_plants(plants, lambda name: name[:-3])
 
@@ -148,134 +167,156 @@ def plot(pods, outdir):
         fig.savefig(outdir / "plot_{}.svg".format(fname))
         fig.clf()
 
-    save(
-        plot_bar_property(
-            genotypes, Genotype.volumes, property_name="volumes of grains"
-        ),
-        "bar_volumes_of_grains",
-    )
-
-    save(
-        plot_bar_property(
-            genotypes, Genotype.n_grains, property_name="number of grains"
-        ),
-        "bar_number_of_grains",
-    )
-
-    save(
-        plot_sorted_property(
-            pods, Pod.mean_volume, property_name="mean volume of grains"
-        ),
-        "mean_volume_of_grains",
-    )
-
-    save(
-        plot_sorted_property(
-            pods, Pod.n_grains, property_name="number of grains"
-        ),
-        "number_of_grains",
-    )
-
-    save(
-        plot_sorted_property(
-            plants,
-            Plant.mean_volume,
-            property_name="grouped mean volume of grains",
-        ),
-        "grouped_mean_volume_of_grains",
-    )
-
-    save(
-        plot_sorted_property(
-            plants,
-            Plant.mean_n_grains,
-            property_name="grouped number of grains",
-        ),
-        "group_number_of_grains",
-    )
-
-    save(
-        plot_sorted_property(
-            pods,
-            Pod.mean_sphericity,
-            property_name="mean sphericity of grains",
-        ),
-        "mean_sphericity_of_grains",
-    )
-
-    save(
-        plot_sorted_property(pods, Pod.length, property_name="length of pod"),
-        "length_of_pod",
-    )
-
-    save(
-        plot_property_vs_property(
-            pods, Pod.length, Pod.n_grains, "length of pod", "number of grains"
-        ),
-        "length_of_pod_vs_number_of_grains",
-    )
-
-    save(
-        plot_property_vs_property(
-            pods,
-            Pod.length,
-            Pod.mean_volume,
-            "length of pod",
-            "mean volume of grains",
-        ),
-        "length_of_pod_vs_mean_volume_of_grains",
-    )
-
-    save(
-        plot_property_vs_property(
-            pods,
-            Pod.n_grains,
-            Pod.mean_volume,
-            "number of grains",
-            "mean volume of grains",
-        ),
-        "number_of_grains_vs_mean_volume_of_grains",
-    )
-
-    save(
-        plot_property_vs_property(
-            pods,
-            Pod.mean_volume,
-            Pod.mean_sphericity,
-            "mean volume of grains",
-            "mean sphericities",
-        ),
-        "mean_volume_of_grains_vs_mean_sphericities",
-    )
-
-    save(
-        plot_property_vs_property(
-            pods,
-            Pod.mean_surface_area,
-            Pod.mean_sphericity,
-            "mean surface area of grains",
-            "mean sphericities",
-        ),
-        "mean_surface_area_of_grains_vs_mean_sphericities",
-    )
-
-    save(
-        plot_pearson_correlations(
-            pods,
-            [
+    if plot == 0:
+        save(
+            plot_bar_property(
+                genotypes, Genotype.volumes, property_name="volumes of grains"
+            ),
+            "bar_volumes_of_grains",
+        )
+    elif plot == 1:
+        save(
+            plot_bar_property(
+                genotypes, Genotype.n_grains, property_name="number of grains"
+            ),
+            "bar_number_of_grains",
+        )
+    elif plot == 2:
+        save(
+            plot_sorted_property(
+                pods, Pod.mean_volume, property_name="mean volume of grains"
+            ),
+            "mean_volume_of_grains",
+        )
+    elif plot == 3:
+        save(
+            plot_sorted_property(
+                pods, Pod.n_grains, property_name="number of grains"
+            ),
+            "number_of_grains",
+        )
+    elif plot == 4:
+        save(
+            plot_sorted_property(
+                plants,
+                Plant.mean_volume,
+                property_name="grouped mean volume of grains",
+            ),
+            "grouped_mean_volume_of_grains",
+        )
+    elif plot == 5:
+        save(
+            plot_sorted_property(
+                plants,
+                Plant.mean_n_grains,
+                property_name="grouped number of grains",
+            ),
+            "group_number_of_grains",
+        )
+    elif plot == 6:
+        save(
+            plot_sorted_property(
+                pods,
+                Pod.mean_sphericity,
+                property_name="mean sphericity of grains",
+            ),
+            "mean_sphericity_of_grains",
+        )
+    elif plot == 7:
+        save(
+            plot_sorted_property(
+                pods, Pod.length, property_name="length of pod"
+            ),
+            "length_of_pod",
+        )
+    elif plot == 8:
+        save(
+            plot_property_vs_property(
+                pods,
                 Pod.length,
                 Pod.n_grains,
+                "length of pod",
+                "number of grains",
+            ),
+            "length_of_pod_vs_number_of_grains",
+        )
+    elif plot == 9:
+        save(
+            plot_property_vs_property(
+                pods,
+                Pod.length,
+                Pod.mean_volume,
+                "length of pod",
+                "mean volume of grains",
+            ),
+            "length_of_pod_vs_mean_volume_of_grains",
+        )
+    elif plot == 10:
+        save(
+            plot_property_vs_property(
+                pods,
+                Pod.n_grains,
+                Pod.mean_volume,
+                "number of grains",
+                "mean volume of grains",
+            ),
+            "number_of_grains_vs_mean_volume_of_grains",
+        )
+    elif plot == 11:
+        save(
+            plot_property_vs_property(
+                pods,
                 Pod.mean_volume,
                 Pod.mean_sphericity,
+                "mean volume of grains",
+                "mean sphericities",
+            ),
+            "mean_volume_of_grains_vs_mean_sphericities",
+        )
+    elif plot == 12:
+        save(
+            plot_property_vs_property(
+                pods,
                 Pod.mean_surface_area,
-            ],
-            ["length", "n_grains", "volumes", "sphericities", "surface_areas"],
-        ),
-        "correlations",
-    )
+                Pod.mean_sphericity,
+                "mean surface area of grains",
+                "mean sphericities",
+            ),
+            "mean_surface_area_of_grains_vs_mean_sphericities",
+        )
+    elif plot == 13:
+        save(
+            plot_pearson_correlations(
+                pods,
+                [
+                    Pod.length,
+                    Pod.n_grains,
+                    Pod.mean_volume,
+                    Pod.mean_sphericity,
+                    Pod.mean_surface_area,
+                ],
+                [
+                    "length",
+                    "n_grains",
+                    "volumes",
+                    "sphericities",
+                    "surface_areas",
+                ],
+            ),
+            "correlations",
+        )
+    else:
+        print("Plot {} does not exist.".format(plot))
 
 
 def main(args):
+    if args.list:
+        print("Possible plots:")
+        for key, description in available_plots.items():
+            print("{}:\t{}".format(key, description))
+
+        return
+
     meta_file = (
         args.meta_file
         if args.meta_file.is_absolute()
@@ -284,8 +325,8 @@ def main(args):
 
     pods = get_data(meta_file, args.working_dir)
 
-    if not args.no_plotting:
-        plot(pods, args.output_dir)
+    for p in args.plot:
+        plot(pods, args.output_dir, p)
 
     if args.print_stats:
         print("Name, Length, Number, Sphericity, Volume, Surface Area")
@@ -362,6 +403,7 @@ def get_arguments():
         "--plot",
         action="append",
         nargs="+",
+        default=[[]],
         type=int,
         help="select which plots to plot",
     )
@@ -395,7 +437,7 @@ def get_arguments():
         "-m",
         "--meta_file",
         type=Path,
-        required=True,
+        default="meta.csv",
         metavar="FILE",
         help="path to the file containing the meta data, relative "
         "paths start from the WORKING_DIR",
