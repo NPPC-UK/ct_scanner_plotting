@@ -125,7 +125,11 @@ def filter_grains(grains, bottom, top):
 
 def get_data(meta_file, base_path):
     meta_type = np.dtype(
-        [("sample_name", np.unicode_, 12), ("folder", np.unicode_, 8)]
+        [
+            ("sample_name", np.unicode_, 12),
+            ("folder", np.unicode_, 8),
+            ("genotype", np.unicode_, 50),
+        ]
     )
 
     meta_data = np.genfromtxt(
@@ -137,8 +141,10 @@ def get_data(meta_file, base_path):
     )
 
     pods = []
+    genotype_lookup = {}
 
     for scan in meta_data:
+        genotype_lookup[scan[0][:-2]] = scan[2]
         csv_dir = base_path / scan[1]
 
         # Glob returns a generator.  I know that there is only one file
@@ -158,12 +164,14 @@ def get_data(meta_file, base_path):
 
         pods.append(pod)
 
-    return pods
+    return pods, genotype_lookup
 
 
-def plot(pods, outdir, plot):
+def plot(pods, outdir, plot, genotype_lookup):
     plants = Plant.group_from_pods(pods, lambda name: name[:-2])
-    genotypes = Genotype.group_from_plants(plants, lambda name: name[:-3])
+    genotypes = Genotype.group_from_plants(
+        plants, lambda name: genotype_lookup[name]
+    )
 
     def save(fig, fname):
         fig.savefig(outdir / "plot_{}.svg".format(fname))
@@ -341,10 +349,10 @@ def main(args):
         else args.working_dir / args.meta_file
     )
 
-    pods = get_data(meta_file, args.working_dir)
+    pods, genotype_lookup = get_data(meta_file, args.working_dir)
 
     for p in args.plot:
-        plot(pods, args.output_dir, p)
+        plot(pods, args.output_dir, p, genotype_lookup)
 
     if args.print_stats:
         print("Name, Length, Number, Sphericity, Volume, Surface Area")
