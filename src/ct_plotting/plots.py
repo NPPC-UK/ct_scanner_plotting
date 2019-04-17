@@ -14,22 +14,14 @@ def plot_bar_property(containers, prop_fn, property_name="Property"):
     prop = [prop_fn(con) for con in containers]
     names = [con.name for con in containers]
 
-    fig = plt.figure(1, figsize=(16, 5))
-    axBar = fig.add_axes([0.05, 0.15, 0.949, 0.63], title=property_name)
+    fig = plt.figure(1, figsize=(11, 8))
+    axBar = fig.add_axes([0.05, 0.3, 0.949, 0.62], title=property_name)
     axBar.boxplot(
         prop, bootstrap=1000, whis=3, flierprops=dict(marker=".", markersize=1)
     )
 
-    axBar_top = axBar.twiny()
-
-    axBar.set_xticks(range(1, len(names) + 1, 2))
-    axBar.set_xticklabels(names[::2], rotation=30, horizontalalignment="right")
-
-    axBar_top.set_xlim(axBar.get_xlim())
-    axBar_top.set_xticks(range(2, len(names) + 2, 2))
-    axBar_top.set_xticklabels(
-        names[1::2], rotation=-30, horizontalalignment="right"
-    )
+    axBar.set_xticks(range(1, len(names) + 1))
+    axBar.set_xticklabels(names, rotation=90, fontsize="small")
 
     for i in range(1, len(names)):
         axBar.axvline(
