@@ -352,12 +352,20 @@ def get_arguments():
     parser = argparse.ArgumentParser(
         description="A program to plot stats of microCT scans of Brassica pods"
     )
+
     parser.add_argument(
-        "-n",
-        "--no_plotting",
-        action="store_true",
-        help="do not plot any graphs",
+        "-l", "--list", action="store_true", help="list the possible plots"
     )
+
+    parser.add_argument(
+        "-P",
+        "--plot",
+        action="append",
+        nargs="+",
+        type=int,
+        help="select which plots to plot",
+    )
+
     parser.add_argument(
         "-p",
         "--print_stats",
@@ -393,7 +401,10 @@ def get_arguments():
         "paths start from the WORKING_DIR",
     )
 
-    return parser.parse_args()
+    args = parser.parse_args()
+    args.plot = set([item for sublist in args.plot for item in sublist])
+
+    return args
 
 
 if __name__ == "__main__":
