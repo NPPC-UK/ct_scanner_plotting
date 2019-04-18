@@ -355,9 +355,11 @@ def main(args):
         plot(pods, args.output_dir, p, genotype_lookup)
 
     if args.print_stats:
-        print("Name, Length, Number, Sphericity, Volume, Surface Area")
+        print(
+            "Name, Length, Number, Sphericity, Volume, Surface Area, Genotype"
+        )
         for pod in pods:
-            print(str(pod))
+            print(str(pod), ",", genotype_lookup[pod.name[:-2]])
 
 
 def plot_distances():
