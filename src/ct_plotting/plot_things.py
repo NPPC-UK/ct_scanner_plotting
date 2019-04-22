@@ -11,6 +11,7 @@ from ct_plotting.plots import (
     plot_pearson_correlations,
     plot_bar_property,
 )
+from fitting import exp_fit_positions
 
 from ct_plotting.data import Pod, Plant, Genotype
 
@@ -351,6 +352,9 @@ def main(args):
 
     pods, genotype_lookup = get_data(meta_file, args.working_dir)
 
+    if args.fit_positions:
+        exp_fit_positions(pods)
+
     for p in args.plot:
         plot(pods, args.output_dir, p, genotype_lookup)
 
@@ -470,6 +474,12 @@ def get_arguments():
         metavar="FILE",
         help="path to the file containing the meta data, relative "
         "paths start from the WORKING_DIR",
+    )
+    parser.add_argument(
+        "--fit_positions",
+        action="store_true",
+        help="attempt to parameterise the 'backbone' of a pod and plot the "
+        "positions of the grains relative to that",
     )
 
     args = parser.parse_args()
