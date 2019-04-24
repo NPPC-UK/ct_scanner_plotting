@@ -4,6 +4,7 @@ import argparse
 import numpy as np
 import matplotlib.pyplot as plt
 import networkx as nx
+import seaborn as sns
 
 from ct_plotting.plots import (
     plot_sorted_property,
@@ -34,6 +35,8 @@ available_plots = {
     14: "Pod mean surface area of grains against pod mean sphericities of "
     "grains",
     15: "Correlation matrix of all the calculable grain properties",
+    16: "Grain positions grouped by plant",
+    17: "Grain positions grouped by genotype",
 }
 
 
@@ -334,6 +337,33 @@ def plot(pods, outdir, plot, genotype_lookup):
             ),
             "correlations",
         )
+    elif plot == 16:
+        real_zs = []
+        for plant in plants:
+            zs = []
+            for pod in plant.pods:
+                zs += pod.real_zs()
+
+            real_zs.append(zs)
+
+        fig = plt.figure(1, figsize=(11, 8))
+        sns.set_style("whitegrid")
+        sns.swarmplot(data=real_zs, size=1),
+        save(fig, "real_zs_plant")
+    elif plot == 17:
+        real_zs = []
+        for genotype in genotypes:
+            zs = []
+            for plant in genotype.plants:
+                for pod in plant.pods:
+                    zs += pod.real_zs()
+
+            real_zs.append(zs)
+
+        fig = plt.figure(1, figsize=(11, 8))
+        sns.set_style("whitegrid")
+        sns.swarmplot(data=real_zs, size=1),
+        save(fig, "real_zs_genotype")
 
 
 def main(args):

@@ -102,7 +102,7 @@ class Pod(Grain_Container):
             bottom_dist = (grain.position - self.bottom).norm()
             top_dist = (grain.position - self.top).norm()
 
-            near_ends.append(bottom_dist < 10 or top_dist < 10)
+            near_ends.append(bottom_dist < 20 or top_dist < 20)
 
         return near_ends
 
@@ -135,6 +135,9 @@ class Pod(Grain_Container):
         )
 
     def _arc_length_integrand(self, p):
+        if self.spine is None:
+            self.fit()
+
         return math.sqrt(
             self.spine[0].deriv()(p) ** 2 + self.spine[1].deriv()(p) ** 2 + 1
         )
@@ -151,6 +154,22 @@ class Pod(Grain_Container):
         return integrate.quad(
             self._arc_length_integrand, self.bottom.z, self.top.z
         )
+
+    def fit(self):
+        xs = [grain.position.x for grain in self.grains]
+        xs.append(self.top.x)
+        xs.insert(0, self.bottom.x)
+        ys = [grain.position.y for grain in self.grains]
+        ys.append(self.top.y)
+        ys.insert(0, self.bottom.y)
+        zs = [grain.position.z for grain in self.grains]
+        zs.append(self.top.z)
+        zs.insert(0, self.bottom.z)
+
+        x_params = np.polyfit(zs, xs, 3)
+        y_params = np.polyfit(zs, ys, 3)
+
+        self.spine = (np.poly1d(x_params), np.poly1d(y_params))
 
 
 class Plant(Grain_Container):
