@@ -1,7 +1,4 @@
-from math import sqrt
-
 import numpy as np
-from scipy import integrate
 import seaborn as sns
 import matplotlib.pyplot as plt
 
@@ -24,23 +21,11 @@ def exp_fit_positions(pods):
         x_params = np.polyfit(z_pos, x_pos, 3)
         y_params = np.polyfit(z_pos, y_pos, 3)
 
-        x = np.poly1d(x_params)
-        y = np.poly1d(y_params)
+        pod.spine = (np.poly1d(x_params), np.poly1d(y_params))
 
-        def arc_length_integrand(p):
-            return sqrt((x.deriv()(p) ** 2 + y.deriv()(p) ** 2 + 1))
+        real_lengths.append(pod.real_length())
 
-        real_length, length_error = integrate.quad(
-            arc_length_integrand, min(z_pos), max(z_pos)
-        )
-        real_lengths.append(real_length)
-
-        real_zs.append(
-            [
-                integrate.quad(arc_length_integrand, min(z_pos), z_cur)[0]
-                for z_cur in z_pos[1:-1]
-            ]
-        )
+        real_zs.append(pod.real_zs())
 
     sns.set_style("whitegrid")
     sns.swarmplot(data=real_zs, size=0.5)

@@ -2,6 +2,7 @@ from statistics import mean
 import math
 
 import numpy as np
+from scipy import integrate
 
 
 def _list_of_props(containers, fn):
@@ -48,6 +49,7 @@ class Pod(Grain_Container):
         self.top = Point(*list(top))
         self.bottom = Point(*list(bottom))
         self.name = name
+        self.spine = None
 
         for grain in grains:
             g_obj = Grain(grain)
@@ -130,6 +132,24 @@ class Pod(Grain_Container):
             self.mean_sphericity(),
             self.mean_volume(),
             self.mean_surface_area(),
+        )
+
+    def _arc_length_integrand(self, p):
+        return math.sqrt(
+            self.spine[0].deriv()(p) ** 2 + self.spine[1].deriv()(p) ** 2 + 1
+        )
+
+    def real_zs(self):
+        zs = [grain.position.z for grain in self.grains]
+
+        return [
+            integrate.quad(self._arc_length_integrand, self.bottom.z, z_cur)[0]
+            for z_cur in zs
+        ]
+
+    def real_length(self):
+        return integrate.quad(
+            self._arc_length_integrand, self.bottom.z, self.top.z
         )
 
 
