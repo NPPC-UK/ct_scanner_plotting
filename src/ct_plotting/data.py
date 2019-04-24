@@ -218,6 +218,13 @@ class Plant(Grain_Container):
     def mean_n_grains(self):
         return mean(self.n_grains())
 
+    def real_zs(self):
+        zs = []
+        for pod in self.pods:
+            zs += pod.real_zs()
+
+        return zs
+
 
 class Genotype(Grain_Container):
     @classmethod
@@ -252,6 +259,13 @@ class Genotype(Grain_Container):
 
     def n_grains(self):
         return _list_of_props(self.plants, Plant.n_grains)
+
+    def real_zs(self):
+        zs = []
+        for plant in self.plants:
+            zs += plant.real_zs()
+
+        return zs
 
 
 class Grain:

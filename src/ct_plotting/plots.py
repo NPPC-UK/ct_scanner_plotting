@@ -3,11 +3,26 @@ from itertools import combinations
 
 import matplotlib.pyplot as plt
 from matplotlib.ticker import NullFormatter
+import seaborn as sns
 
 import numpy as np
 
 from scipy.stats import gaussian_kde
 from scipy.stats.stats import pearsonr
+
+
+def plot_swarm_property(containers, prop_fn, property_name="Property"):
+    prop = [prop_fn(con) for con in containers]
+    names = [con.name for con in containers]
+
+    fig = plt.figure(1, figsize=(11, 8))
+    axSwarm = fig.add_axes([0.05, 0.3, 0.949, 0.62], title=property_name)
+    sns.swarmplot(data=prop, ax=axSwarm, size=1)
+
+    axSwarm.set_xticks(range(1, len(names) + 1))
+    axSwarm.set_xticklabels(names, rotation=90, fontsize="small")
+
+    return fig
 
 
 def plot_bar_property(containers, prop_fn, property_name="Property"):

@@ -4,15 +4,14 @@ import argparse
 import numpy as np
 import matplotlib.pyplot as plt
 import networkx as nx
-import seaborn as sns
 
 from ct_plotting.plots import (
     plot_sorted_property,
     plot_property_vs_property,
     plot_pearson_correlations,
     plot_bar_property,
+    plot_swarm_property,
 )
-from fitting import exp_fit_positions
 
 from ct_plotting.data import Pod, Plant, Genotype
 
@@ -338,32 +337,15 @@ def plot(pods, outdir, plot, genotype_lookup):
             "correlations",
         )
     elif plot == 16:
-        real_zs = []
-        for plant in plants:
-            zs = []
-            for pod in plant.pods:
-                zs += pod.real_zs()
-
-            real_zs.append(zs)
-
-        fig = plt.figure(1, figsize=(11, 8))
-        sns.set_style("whitegrid")
-        sns.swarmplot(data=real_zs, size=1),
-        save(fig, "real_zs_plant")
+        save(
+            plot_swarm_property(plants, Plant.real_zs, "grain position"),
+            "real_zs_plant",
+        )
     elif plot == 17:
-        real_zs = []
-        for genotype in genotypes:
-            zs = []
-            for plant in genotype.plants:
-                for pod in plant.pods:
-                    zs += pod.real_zs()
-
-            real_zs.append(zs)
-
-        fig = plt.figure(1, figsize=(11, 8))
-        sns.set_style("whitegrid")
-        sns.swarmplot(data=real_zs, size=1),
-        save(fig, "real_zs_genotype")
+        save(
+            plot_swarm_property(genotypes, Genotype.real_zs, "grain position"),
+            "real_zs_genotype",
+        )
 
 
 def main(args):
@@ -383,9 +365,6 @@ def main(args):
     pods, genotype_lookup = get_data(meta_file, args.working_dir)
     for pod in pods:
         pod.filter()
-
-    if args.fit_positions:
-        exp_fit_positions(pods)
 
     for p in args.plot:
         plot(pods, args.output_dir, p, genotype_lookup)
