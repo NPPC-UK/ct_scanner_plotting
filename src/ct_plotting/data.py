@@ -84,6 +84,11 @@ class Pod(Grain_Container):
         return [g.sphericity() for g in self.grains]
 
     def filter(self):
+        # It is not possible to fit the spine accurately after filtering, so do
+        # now.
+        if self.spine is None:
+            self.fit()
+
         self.grains = [
             grain
             for grain, near_ends in zip(self.grains, self._near_ends())

@@ -381,6 +381,8 @@ def main(args):
     )
 
     pods, genotype_lookup = get_data(meta_file, args.working_dir)
+    for pod in pods:
+        pod.filter()
 
     if args.fit_positions:
         exp_fit_positions(pods)
