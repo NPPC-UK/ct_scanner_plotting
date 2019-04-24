@@ -363,8 +363,10 @@ def main(args):
     )
 
     pods, genotype_lookup = get_data(meta_file, args.working_dir)
-    for pod in pods:
-        pod.filter()
+
+    if args.filter:
+        for pod in pods:
+            pod.filter()
 
     for p in args.plot:
         plot(pods, args.output_dir, p, genotype_lookup)
@@ -487,10 +489,9 @@ def get_arguments():
         "paths start from the WORKING_DIR",
     )
     parser.add_argument(
-        "--fit_positions",
+        "--filter",
         action="store_true",
-        help="attempt to parameterise the 'backbone' of a pod and plot the "
-        "positions of the grains relative to that",
+        help="remove implausibly positioned grains",
     )
 
     args = parser.parse_args()
