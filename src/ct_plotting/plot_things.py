@@ -36,6 +36,7 @@ available_plots = {
     15: "Correlation matrix of all the calculable grain properties",
     16: "Grain positions grouped by plant",
     17: "Grain positions grouped by genotype",
+    18: "Boxplot of grain density grouped by genotype",
 }
 
 
@@ -345,6 +346,22 @@ def plot(pods, outdir, plot, genotype_lookup):
         save(
             plot_swarm_property(genotypes, Genotype.real_zs, "grain position"),
             "real_zs_genotype",
+        )
+    elif plot == 18:
+
+        def densities(genotype):
+            ds = []
+            for plant in genotype.plants:
+                for pod in plant.pods:
+                    ds.append(pod.n_grains() / pod.length())
+
+            return ds
+
+        save(
+            plot_bar_property(
+                genotypes, densities, property_name="densities of grains"
+            ),
+            "bar_density_of_grains",
         )
 
 
