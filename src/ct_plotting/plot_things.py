@@ -326,6 +326,7 @@ def plot(pods, outdir, plot, genotype_lookup):
                     Pod.mean_volume,
                     Pod.mean_sphericity,
                     Pod.mean_surface_area,
+                    lambda pod: pod.n_grains() / pod.length(),
                 ],
                 [
                     "length",
@@ -333,6 +334,7 @@ def plot(pods, outdir, plot, genotype_lookup):
                     "volumes",
                     "sphericities",
                     "surface_areas",
+                    "grain_density",
                 ],
             ),
             "correlations",
