@@ -37,6 +37,7 @@ available_plots = {
     16: "Grain positions grouped by plant",
     17: "Grain positions grouped by genotype",
     18: "Boxplot of grain density grouped by genotype",
+    19: "Boxplot of total grain volume in pods grouped by genotype",
 }
 
 
@@ -364,6 +365,24 @@ def plot(pods, outdir, plot, genotype_lookup):
                 genotypes, densities, property_name="densities of grains"
             ),
             "bar_density_of_grains",
+        )
+    elif plot == 19:
+
+        def sum_grain_volumes(genotype):
+            vs = []
+            for plant in genotype.plants:
+                for pod in plant.pods:
+                    vs.append(sum(pod.volumes()))
+
+            return vs
+
+        save(
+            plot_bar_property(
+                genotypes,
+                sum_grain_volumes,
+                property_name="sum of grain volume per pod",
+            ),
+            "bar_sum_grain_volumes_in_pod",
         )
 
 
