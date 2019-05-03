@@ -129,14 +129,16 @@ class Pod(Grain_Container):
         )
 
     def __str__(self):
-        format_str = "{}, {}, {}, {}, {}, {}"
+        format_str = "{}, {}, {}, {}, {}, {}, {}, {}"
         return format_str.format(
             self.name,
-            (self.top - self.bottom).norm(),
+            self.length(),
             self.n_grains(),
             self.mean_sphericity(),
             self.mean_volume(),
             self.mean_surface_area(),
+            self.real_length(),
+            self.n_grains() / self.real_length(),
         )
 
     def _arc_length_integrand(self, p):
@@ -158,7 +160,7 @@ class Pod(Grain_Container):
     def real_length(self):
         return integrate.quad(
             self._arc_length_integrand, self.bottom.z, self.top.z
-        )
+        )[0]
 
     def fit(self):
         xs = [grain.position.x for grain in self.grains]

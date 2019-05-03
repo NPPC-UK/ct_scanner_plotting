@@ -411,7 +411,8 @@ def main(args):
 
     if args.print_stats:
         print(
-            "Name, Length, Number, Sphericity, Volume, Surface Area, Genotype"
+            "Name, Length, N_Grains, Sphericity, Volume, Surface Area, "
+            "Real Length, Density (N_Grains/Real Length), Genotype"
         )
         for pod in pods:
             print(str(pod), ",", genotype_lookup[pod.name[:-2]])
