@@ -114,7 +114,10 @@ class Pod(Grain_Container):
             bottom_dist = (grain.position - self.bottom).norm()
             top_dist = (grain.position - self.top).norm()
 
-            near_ends.append(bottom_dist < 20 or top_dist < 20)
+            near_ends.append(
+                bottom_dist < 0.02 * self.real_length()
+                or top_dist < 0.02 * self.real_length()
+            )
 
         return near_ends
 
