@@ -22,13 +22,20 @@ class Grain_Container:
     """
 
     def mean_sphericity(self):
-        return mean(self.sphericities())
+
+        return (
+            mean(self.sphericities()) if self.n_grains() != 0 else float("nan")
+        )
 
     def mean_surface_area(self):
-        return mean(self.surface_areas())
+        return (
+            mean(self.surface_areas())
+            if self.n_grains() != 0
+            else float("nan")
+        )
 
     def mean_volume(self):
-        return mean(self.volumes())
+        return mean(self.volumes()) if self.n_grains() != 0 else float("nan")
 
     def sphericities(self):
         raise NotImplementedError()
