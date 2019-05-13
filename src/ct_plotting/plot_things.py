@@ -156,7 +156,7 @@ def get_data(meta_file, base_path):
         # matching.  I collect on the entire generator and retrieve the first
         # item.
         try:
-            grains_file = list(csv_dir.glob("*.ISQ.csv"))[0]
+            grains_file = list(csv_dir.glob("*.ISQ-raw_stats.csv"))[0]
         except IndexError:
             continue
 
