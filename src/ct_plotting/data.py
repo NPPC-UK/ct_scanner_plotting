@@ -178,6 +178,18 @@ class Pod(Grain_Container):
 
         self.spine = (np.poly1d(x_params), np.poly1d(y_params))
 
+    def scale(self, factor):
+        """Scale all dimensions of the pod by a factor of 'factor'
+
+        The behaviour of the pod is not defined if the spine has been
+        previously fitted!
+        """
+        for grain in self.grains:
+            grain.scale(factor)
+
+        self.top.scale(factor)
+        self.bottom.scale(factor)
+
 
 class Plant(Grain_Container):
     @classmethod
@@ -288,6 +300,11 @@ class Grain:
             and self.surface_area == other.surface_area
         )
 
+    def scale(self, factor):
+        self.position.scale(factor)
+        self.volume /= factor ** 3
+        self.surface_area /= factor ** 2
+
 
 class Point:
     def __init__(self, x, y, z):
@@ -300,6 +317,11 @@ class Point:
 
     def __sub__(self, other):
         return type(self)(self.x - other.x, self.y - other.y, self.z - other.z)
+
+    def scale(self, factor):
+        self.x /= factor
+        self.y /= factor
+        self.z /= factor
 
     def __repr__(self):
         return "Point({}, {}, {})".format(self.x, self.y, self.z)

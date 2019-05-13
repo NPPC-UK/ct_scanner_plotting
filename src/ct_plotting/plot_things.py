@@ -402,6 +402,10 @@ def main(args):
 
     pods, genotype_lookup = get_data(meta_file, args.working_dir)
 
+    if args.scale != 1.0:
+        for pod in pods:
+            pod.scale(args.scale)
+
     if args.filter:
         for pod in pods:
             pod.filter()
@@ -531,6 +535,13 @@ def get_arguments():
         "--filter",
         action="store_true",
         help="remove implausibly positioned grains",
+    )
+    parser.add_argument(
+        "-s",
+        "--scale",
+        type=float,
+        help="scale all distances and positions by dividing by this number",
+        default=1.0,
     )
 
     args = parser.parse_args()
