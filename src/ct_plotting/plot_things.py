@@ -543,6 +543,13 @@ def get_arguments():
         help="scale all distances and positions by dividing by this number",
         default=1.0,
     )
+    parser.add_argument(
+        "-t",
+        "--from_top",
+        action="store_true",
+        default=True,
+        help="all distances are measured from the top of the scan",
+    )
 
     args = parser.parse_args()
     args.plot = set([item for sublist in args.plot for item in sublist])
