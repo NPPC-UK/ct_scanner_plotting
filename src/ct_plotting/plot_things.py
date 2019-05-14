@@ -17,54 +17,54 @@ from ct_plotting.data import Pod, Plant, Genotype
 
 
 available_plots = {
-    0: "Boxplot of grain volumes grouped by genotype",
-    1: "Boxplot of number of grains grouped by genotype",
+    0: "Boxplot of seed volumes grouped by genotype",
+    1: "Boxplot of number of seeds grouped by genotype",
     2: "Boxplot of sphericities grouped by genotype",
     3: "Boxplot of surface areas grouped by genotype",
-    4: "Sorted pod mean of grain volume",
-    5: "Sorted number of grains in pods",
-    6: "Sorted plant mean of grain volume",
-    7: "Sorted number of grains in plants",
-    8: "Sorted pod mean of grain sphericities",
+    4: "Sorted pod mean of seed volume",
+    5: "Sorted number of seeds in pods",
+    6: "Sorted plant mean of seed volume",
+    7: "Sorted number of seeds in plants",
+    8: "Sorted pod mean of seed sphericities",
     9: "Sorted pod length",
-    10: "Number of grains against pod length",
-    11: "Pod length against pod mean volume of grains",
-    12: "Number of grains against pod mean volume of grains",
-    13: "Pod mean volume of grains against pod mean sphericity of grains",
-    14: "Pod mean surface area of grains against pod mean sphericities of "
-    "grains",
-    15: "Correlation matrix of all the calculable grain properties",
-    16: "Grain positions grouped by plant",
-    17: "Grain positions grouped by genotype",
-    18: "Boxplot of grain density grouped by genotype",
-    19: "Boxplot of total grain volume in pods grouped by genotype",
+    10: "Number of seeds against pod length",
+    11: "Pod length against pod mean volume of seeds",
+    12: "Number of seeds against pod mean volume of seeds",
+    13: "Pod mean volume of seeds against pod mean sphericity of seeds",
+    14: "Pod mean surface area of seeds against pod mean sphericities of "
+    "seeds",
+    15: "Correlation matrix of all the calculable seed properties",
+    16: "Seed positions grouped by plant",
+    17: "Seed positions grouped by genotype",
+    18: "Boxplot of seed density grouped by genotype",
+    19: "Boxplot of total seed volume in pods grouped by genotype",
     20: "Boxplot of pod length grouped by genotype",
 }
 
 
-def merge_grains(grains):
-    """Return a grain corresponding to the 'sum' of an arbitrary number of
-    other grains.
+def merge_seeds(seeds):
+    """Return a seed corresponding to the 'sum' of an arbitrary number of
+    other seeds.
 
-    Many parameters are meaningless of a merged grain.  Only the center of
+    Many parameters are meaningless of a merged seed.  Only the center of
     mass, and total volume make complete sense.  Surface area is more iffy.
-    Should we count the surface of the grain fragments that are facing each
+    Should we count the surface of the seed fragments that are facing each
     other? The simple sum is calculated here.
 
-    Return a merged grains that has null values except where explained above.
+    Return a merged seeds that has null values except where explained above.
     """
     xc, yc, zc = 0, 0, 0
 
-    xc = sum([grain[5] * grain[9] for grain in grains]) / sum(
-        [grain[5] for grain in grains]
+    xc = sum([seed[5] * seed[9] for seed in seeds]) / sum(
+        [seed[5] for seed in seeds]
     )
 
-    yc = sum([grain[5] * grain[10] for grain in grains]) / sum(
-        [grain[5] for grain in grains]
+    yc = sum([seed[5] * seed[10] for seed in seeds]) / sum(
+        [seed[5] for seed in seeds]
     )
 
-    zc = sum([grain[5] * grain[11] for grain in grains]) / sum(
-        [grain[5] for grain in grains]
+    zc = sum([seed[5] * seed[11] for seed in seeds]) / sum(
+        [seed[5] for seed in seeds]
     )
     return np.array(
         [
@@ -73,9 +73,9 @@ def merge_grains(grains):
             -1,
             -1,
             -1,
-            sum([grain[5] for grain in grains]),
+            sum([seed[5] for seed in seeds]),
             -1,
-            sum([grain[7] for grain in grains]),
+            sum([seed[7] for seed in seeds]),
             -1,
             xc,
             yc,
@@ -86,47 +86,47 @@ def merge_grains(grains):
     )
 
 
-def filter_grains(grains, bottom, top):
-    """Filter grains of a pod.
+def filter_seeds(seeds, bottom, top):
+    """Filter seeds of a pod.
 
-    Delete those grains that are too close to the ends of a pod to be real.
+    Delete those seeds that are too close to the ends of a pod to be real.
     Merge those whose centres are too close together to be real.
 
     Return the rest.
     """
-    false_grains_idxs = []
+    false_seeds_idxs = []
 
-    for idx, grain in enumerate(grains):
-        bottom_dist = np.linalg.norm(grain[9:12] - bottom)
-        top_dist = np.linalg.norm(grain[9:12] - top)
+    for idx, seed in enumerate(seeds):
+        bottom_dist = np.linalg.norm(seed[9:12] - bottom)
+        top_dist = np.linalg.norm(seed[9:12] - top)
 
         near_ends = bottom_dist < 100 or top_dist < 100
         if near_ends:
-            false_grains_idxs.append(idx)
+            false_seeds_idxs.append(idx)
 
-    filtered_grains = np.delete(grains, false_grains_idxs, 0)
+    filtered_seeds = np.delete(seeds, false_seeds_idxs, 0)
 
-    grain_merge_candidates = []
+    seed_merge_candidates = []
 
-    for idx, grain in enumerate(filtered_grains):
+    for idx, seed in enumerate(filtered_seeds):
         distances = np.linalg.norm(
-            filtered_grains[:, 9:12] - grain[9:12], axis=1
+            filtered_seeds[:, 9:12] - seed[9:12], axis=1
         )
         for dist_idx, dist in enumerate(distances):
             if dist_idx <= idx:
                 continue
 
             if dist < 10:
-                grain_merge_candidates.append((idx, dist_idx))
+                seed_merge_candidates.append((idx, dist_idx))
 
     G = nx.Graph()
-    G.add_edges_from(grain_merge_candidates)
+    G.add_edges_from(seed_merge_candidates)
     to_delete = []
     for to_merge in nx.connected_components(G):
-        filtered_grains += merge_grains([filtered_grains[i] for i in to_merge])
+        filtered_seeds += merge_seeds([filtered_seeds[i] for i in to_merge])
         to_delete += to_merge
 
-    return np.delete(filtered_grains, to_delete, 0)
+    return np.delete(filtered_seeds, to_delete, 0)
 
 
 def get_data(meta_file, base_path):
@@ -157,7 +157,7 @@ def get_data(meta_file, base_path):
         # matching.  I collect on the entire generator and retrieve the first
         # item.
         try:
-            grains_file = list(csv_dir.glob("*.ISQ-raw_stats.csv"))[0]
+            seeds_file = list(csv_dir.glob("*.ISQ-raw_stats.csv"))[0]
         except IndexError:
             continue
 
@@ -166,7 +166,7 @@ def get_data(meta_file, base_path):
         except IndexError:
             continue
 
-        pod = Pod.pod_from_files(grains_file, length_file, scan[0])
+        pod = Pod.pod_from_files(seeds_file, length_file, scan[0])
 
         pods.append(pod)
 
@@ -186,75 +186,75 @@ def plot(pods, outdir, plot, genotype_lookup):
     if plot == 0:
         save(
             plot_bar_property(
-                genotypes, Genotype.volumes, property_name="volumes of grains"
+                genotypes, Genotype.volumes, property_name="volumes of seeds"
             ),
-            "bar_volumes_of_grains",
+            "bar_volumes_of_seeds",
         )
     elif plot == 1:
         save(
             plot_bar_property(
-                genotypes, Genotype.n_grains, property_name="number of grains"
+                genotypes, Genotype.n_seeds, property_name="number of seeds"
             ),
-            "bar_number_of_grains",
+            "bar_number_of_seeds",
         )
     elif plot == 2:
         save(
             plot_bar_property(
                 genotypes,
                 Genotype.sphericities,
-                property_name="sphericities of grains",
+                property_name="sphericities of seeds",
             ),
-            "bar_sphericities_of_grains",
+            "bar_sphericities_of_seeds",
         )
     elif plot == 3:
         save(
             plot_bar_property(
                 genotypes,
                 Genotype.surface_areas,
-                property_name="surface area of grains",
+                property_name="surface area of seeds",
             ),
-            "bar_surface_area_of_grains",
+            "bar_surface_area_of_seeds",
         )
     elif plot == 4:
         save(
             plot_sorted_property(
-                pods, Pod.mean_volume, property_name="mean volume of grains"
+                pods, Pod.mean_volume, property_name="mean volume of seeds"
             ),
-            "mean_volume_of_grains",
+            "mean_volume_of_seeds",
         )
     elif plot == 5:
         save(
             plot_sorted_property(
-                pods, Pod.n_grains, property_name="number of grains"
+                pods, Pod.n_seeds, property_name="number of seeds"
             ),
-            "number_of_grains",
+            "number_of_seeds",
         )
     elif plot == 6:
         save(
             plot_sorted_property(
                 plants,
                 Plant.mean_volume,
-                property_name="grouped mean volume of grains",
+                property_name="grouped mean volume of seeds",
             ),
-            "grouped_mean_volume_of_grains",
+            "grouped_mean_volume_of_seeds",
         )
     elif plot == 7:
         save(
             plot_sorted_property(
                 plants,
-                Plant.mean_n_grains,
-                property_name="grouped number of grains",
+                Plant.mean_n_seeds,
+                property_name="grouped number of seeds",
             ),
-            "group_number_of_grains",
+            "group_number_of_seeds",
         )
     elif plot == 8:
         save(
             plot_sorted_property(
                 pods,
                 Pod.mean_sphericity,
-                property_name="mean sphericity of grains",
+                property_name="mean sphericity of seeds",
             ),
-            "mean_sphericity_of_grains",
+            "mean_sphericity_of_seeds",
         )
     elif plot == 9:
         save(
@@ -268,11 +268,11 @@ def plot(pods, outdir, plot, genotype_lookup):
             plot_property_vs_property(
                 pods,
                 Pod.length,
-                Pod.n_grains,
+                Pod.n_seeds,
                 "length of pod",
-                "number of grains",
+                "number of seeds",
             ),
-            "length_of_pod_vs_number_of_grains",
+            "length_of_pod_vs_number_of_seeds",
         )
     elif plot == 11:
         save(
@@ -281,20 +281,20 @@ def plot(pods, outdir, plot, genotype_lookup):
                 Pod.length,
                 Pod.mean_volume,
                 "length of pod",
-                "mean volume of grains",
+                "mean volume of seeds",
             ),
-            "length_of_pod_vs_mean_volume_of_grains",
+            "length_of_pod_vs_mean_volume_of_seeds",
         )
     elif plot == 12:
         save(
             plot_property_vs_property(
                 pods,
-                Pod.n_grains,
+                Pod.n_seeds,
                 Pod.mean_volume,
-                "number of grains",
-                "mean volume of grains",
+                "number of seeds",
+                "mean volume of seeds",
             ),
-            "number_of_grains_vs_mean_volume_of_grains",
+            "number_of_seeds_vs_mean_volume_of_seeds",
         )
     elif plot == 13:
         save(
@@ -302,10 +302,10 @@ def plot(pods, outdir, plot, genotype_lookup):
                 pods,
                 Pod.mean_volume,
                 Pod.mean_sphericity,
-                "mean volume of grains",
+                "mean volume of seeds",
                 "mean sphericities",
             ),
-            "mean_volume_of_grains_vs_mean_sphericities",
+            "mean_volume_of_seeds_vs_mean_sphericities",
         )
     elif plot == 14:
         save(
@@ -313,10 +313,10 @@ def plot(pods, outdir, plot, genotype_lookup):
                 pods,
                 Pod.mean_surface_area,
                 Pod.mean_sphericity,
-                "mean surface area of grains",
+                "mean surface area of seeds",
                 "mean sphericities",
             ),
-            "mean_surface_area_of_grains_vs_mean_sphericities",
+            "mean_surface_area_of_seeds_vs_mean_sphericities",
         )
     elif plot == 15:
         save(
@@ -324,31 +324,31 @@ def plot(pods, outdir, plot, genotype_lookup):
                 pods,
                 [
                     Pod.length,
-                    Pod.n_grains,
+                    Pod.n_seeds,
                     Pod.mean_volume,
                     Pod.mean_sphericity,
                     Pod.mean_surface_area,
-                    lambda pod: pod.n_grains() / pod.length(),
+                    lambda pod: pod.n_seeds() / pod.length(),
                 ],
                 [
                     "length",
-                    "n_grains",
+                    "n_seeds",
                     "volumes",
                     "sphericities",
                     "surface_areas",
-                    "grain_density",
+                    "seed_density",
                 ],
             ),
             "correlations",
         )
     elif plot == 16:
         save(
-            plot_swarm_property(plants, Plant.real_zs, "grain position"),
+            plot_swarm_property(plants, Plant.real_zs, "seed position"),
             "real_zs_plant",
         )
     elif plot == 17:
         save(
-            plot_swarm_property(genotypes, Genotype.real_zs, "grain position"),
+            plot_swarm_property(genotypes, Genotype.real_zs, "seed position"),
             "real_zs_genotype",
         )
     elif plot == 18:
@@ -357,19 +357,19 @@ def plot(pods, outdir, plot, genotype_lookup):
             ds = []
             for plant in genotype.plants:
                 for pod in plant.pods:
-                    ds.append(pod.n_grains() / pod.length())
+                    ds.append(pod.n_seeds() / pod.length())
 
             return ds
 
         save(
             plot_bar_property(
-                genotypes, densities, property_name="densities of grains"
+                genotypes, densities, property_name="densities of seeds"
             ),
-            "bar_density_of_grains",
+            "bar_density_of_seeds",
         )
     elif plot == 19:
 
-        def sum_grain_volumes(genotype):
+        def sum_seed_volumes(genotype):
             vs = []
             for plant in genotype.plants:
                 for pod in plant.pods:
@@ -380,10 +380,10 @@ def plot(pods, outdir, plot, genotype_lookup):
         save(
             plot_bar_property(
                 genotypes,
-                sum_grain_volumes,
-                property_name="sum of grain volume per pod",
+                sum_seed_volumes,
+                property_name="sum of seed volume per pod",
             ),
-            "bar_sum_grain_volumes_in_pod",
+            "bar_sum_seed_volumes_in_pod",
         )
     elif plot == 20:
 
@@ -431,8 +431,8 @@ def main(args):
 
     if args.print_stats:
         print(
-            "Name, Length, N_Grains, Sphericity, Volume, Surface Area, "
-            "Real Length, Density (N_Grains/Real Length), Genotype"
+            "Name, Length, N_Seeds, Sphericity, Volume, Surface Area, "
+            "Real Length, Density (N_Seeds/Real Length), Genotype"
         )
         for pod in pods:
             print(str(pod), ",", genotype_lookup[pod.name[:-2]])
@@ -453,7 +453,7 @@ def plot_distances():
         coords = data[0][:, 9:12][data[0][:, 11].argsort()]
         for i in range(1, len(coords[:, 0])):
             d = np.linalg.norm(coords[i, :] - coords[i - 1, :])
-            # Ignore very small separations.  These are not separate grains
+            # Ignore very small separations.  These are not separate seeds
             if d > 5:
                 distances[name].append(d)
 
@@ -487,7 +487,7 @@ def plot_distances():
             range(1, (end - start) + 1), names[start:end], rotation="vertical"
         )
         plt.ylim(0, max_distance + 10)
-        plt.savefig("plot_distances_between_grains_{}.svg".format(i / 10))
+        plt.savefig("plot_distances_between_seeds_{}.svg".format(i / 10))
         plt.clf()
 
     return grouped_distances
@@ -550,7 +550,7 @@ def get_arguments():
     parser.add_argument(
         "--filter",
         action="store_true",
-        help="remove implausibly positioned grains",
+        help="remove implausibly positioned seeds",
     )
     parser.add_argument(
         "-s",

@@ -13,29 +13,27 @@ def _list_of_props(containers, fn):
     return ls
 
 
-class Grain_Container:
+class Seed_Container:
     """Abstract base class that generalises between Pods, Treatments and
     Genotypes.
 
-    All of these things contain a set of Grains, and all of them can
-    calculate mean properties of the grains.
+    All of these things contain a set of Seeds, and all of them can
+    calculate mean properties of the seeds.
     """
 
     def mean_sphericity(self):
 
         return (
-            mean(self.sphericities()) if self.n_grains() != 0 else float("nan")
+            mean(self.sphericities()) if self.n_seeds() != 0 else float("nan")
         )
 
     def mean_surface_area(self):
         return (
-            mean(self.surface_areas())
-            if self.n_grains() != 0
-            else float("nan")
+            mean(self.surface_areas()) if self.n_seeds() != 0 else float("nan")
         )
 
     def mean_volume(self):
-        return mean(self.volumes()) if self.n_grains() != 0 else float("nan")
+        return mean(self.volumes()) if self.n_seeds() != 0 else float("nan")
 
     def sphericities(self):
         raise NotImplementedError()
@@ -46,49 +44,47 @@ class Grain_Container:
     def volumes(self):
         raise NotImplementedError()
 
-    def n_grains(self):
-        return len(self.grains)
+    def n_seeds(self):
+        return len(self.seeds)
 
 
-class Pod(Grain_Container):
-    def __init__(self, grains, top, bottom, name):
-        self.grains = []
+class Pod(Seed_Container):
+    def __init__(self, seeds, top, bottom, name):
+        self.seeds = []
         self.top = Point(*list(top))
         self.bottom = Point(*list(bottom))
         self.name = name
         self.spine = None
 
-        for grain in grains:
-            g_obj = Grain(grain)
+        for seed in seeds:
+            g_obj = Seed(seed)
 
             if (
                 g_obj.position.z < self.bottom.z
                 or g_obj.position.z > self.top.z
             ):
-                raise ValueError(
-                    "Grain {} is outside pod limits".format(g_obj)
-                )
+                raise ValueError("Seed {} is outside pod limits".format(g_obj))
 
-            self.grains.append(g_obj)
+            self.seeds.append(g_obj)
 
     @classmethod
-    def pod_from_files(cls, grains_file, length_file, name):
+    def pod_from_files(cls, seeds_file, length_file, name):
         length = np.genfromtxt(length_file, delimiter=",", skip_header=0)
         return cls(
-            np.genfromtxt(grains_file, delimiter=",", skip_header=1),
+            np.genfromtxt(seeds_file, delimiter=",", skip_header=1),
             length[4:],
             length[1:4],
             name,
         )
 
     def volumes(self):
-        return [g.volume for g in self.grains]
+        return [g.volume for g in self.seeds]
 
     def surface_areas(self):
-        return [g.surface_area for g in self.grains]
+        return [g.surface_area for g in self.seeds]
 
     def sphericities(self):
-        return [g.sphericity() for g in self.grains]
+        return [g.sphericity() for g in self.seeds]
 
     def filter(self):
         # It is not possible to fit the spine accurately after filtering, so do
@@ -96,23 +92,23 @@ class Pod(Grain_Container):
         if self.spine is None:
             self.fit()
 
-        self.grains = [
-            grain
-            for grain, near_ends in zip(self.grains, self._near_ends())
+        self.seeds = [
+            seed
+            for seed, near_ends in zip(self.seeds, self._near_ends())
             if not near_ends
         ]
 
-    def n_grains(self):
-        return len(self.grains)
+    def n_seeds(self):
+        return len(self.seeds)
 
     def length(self):
         return (self.top - self.bottom).norm()
 
     def _near_ends(self):
         near_ends = []
-        for idx, grain in enumerate(self.grains):
-            bottom_dist = (grain.position - self.bottom).norm()
-            top_dist = (grain.position - self.top).norm()
+        for idx, seed in enumerate(self.seeds):
+            bottom_dist = (seed.position - self.bottom).norm()
+            top_dist = (seed.position - self.top).norm()
 
             near_ends.append(
                 bottom_dist < 0.02 * self.real_length()
@@ -122,18 +118,18 @@ class Pod(Grain_Container):
         return near_ends
 
     def __eq__(self, other):
-        if len(self.grains) != len(other.grains):
+        if len(self.seeds) != len(other.seeds):
             return False
 
-        grains_equal = all(
+        seeds_equal = all(
             [
-                s_grain == o_grain
-                for s_grain, o_grain in zip(self.grains, other.grains)
+                s_seed == o_seed
+                for s_seed, o_seed in zip(self.seeds, other.seeds)
             ]
         )
 
         return (
-            grains_equal
+            seeds_equal
             and self.top == other.top
             and self.bottom == other.bottom
         )
@@ -143,12 +139,12 @@ class Pod(Grain_Container):
         return format_str.format(
             self.name,
             self.length(),
-            self.n_grains(),
+            self.n_seeds(),
             self.mean_sphericity(),
             self.mean_volume(),
             self.mean_surface_area(),
             self.real_length(),
-            self.n_grains() / self.real_length(),
+            self.n_seeds() / self.real_length(),
         )
 
     def _arc_length_integrand(self, p):
@@ -160,7 +156,7 @@ class Pod(Grain_Container):
         )
 
     def real_zs(self):
-        zs = [grain.position.z for grain in self.grains]
+        zs = [seed.position.z for seed in self.seeds]
 
         return [
             integrate.quad(self._arc_length_integrand, self.bottom.z, z_cur)[0]
@@ -173,13 +169,13 @@ class Pod(Grain_Container):
         )[0]
 
     def fit(self):
-        xs = [grain.position.x for grain in self.grains]
+        xs = [seed.position.x for seed in self.seeds]
         xs.append(self.top.x)
         xs.insert(0, self.bottom.x)
-        ys = [grain.position.y for grain in self.grains]
+        ys = [seed.position.y for seed in self.seeds]
         ys.append(self.top.y)
         ys.insert(0, self.bottom.y)
-        zs = [grain.position.z for grain in self.grains]
+        zs = [seed.position.z for seed in self.seeds]
         zs.append(self.top.z)
         zs.insert(0, self.bottom.z)
 
@@ -194,14 +190,14 @@ class Pod(Grain_Container):
         The behaviour of the pod is not defined if the spine has been
         previously fitted!
         """
-        for grain in self.grains:
-            grain.scale(factor)
+        for seed in self.seeds:
+            seed.scale(factor)
 
         self.top.scale(factor)
         self.bottom.scale(factor)
 
 
-class Plant(Grain_Container):
+class Plant(Seed_Container):
     @classmethod
     def group_from_pods(cls, pods, name_fn):
         plants = []
@@ -232,15 +228,15 @@ class Plant(Grain_Container):
     def surface_areas(self):
         return _list_of_props(self.pods, Pod.surface_areas)
 
-    def n_grains(self):
-        n_grains = []
+    def n_seeds(self):
+        n_seeds = []
         for pod in self.pods:
-            n_grains.append(pod.n_grains())
+            n_seeds.append(pod.n_seeds())
 
-        return n_grains
+        return n_seeds
 
-    def mean_n_grains(self):
-        return mean(self.n_grains())
+    def mean_n_seeds(self):
+        return mean(self.n_seeds())
 
     def real_zs(self):
         zs = []
@@ -250,7 +246,7 @@ class Plant(Grain_Container):
         return zs
 
 
-class Genotype(Grain_Container):
+class Genotype(Seed_Container):
     @classmethod
     def group_from_plants(cls, plants, name_fn):
         genotypes = []
@@ -281,8 +277,8 @@ class Genotype(Grain_Container):
     def volumes(self):
         return _list_of_props(self.plants, Plant.volumes)
 
-    def n_grains(self):
-        return _list_of_props(self.plants, Plant.n_grains)
+    def n_seeds(self):
+        return _list_of_props(self.plants, Plant.n_seeds)
 
     def real_zs(self):
         zs = []
@@ -292,11 +288,11 @@ class Genotype(Grain_Container):
         return zs
 
 
-class Grain:
-    def __init__(self, grain):
-        self.position = Point(*list(grain[9:12]))
-        self.volume = grain[5]
-        self.surface_area = grain[7]
+class Seed:
+    def __init__(self, seed):
+        self.position = Point(*list(seed[9:12]))
+        self.volume = seed[5]
+        self.surface_area = seed[7]
 
     def sphericity(self):
         return (
