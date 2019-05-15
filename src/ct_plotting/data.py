@@ -196,6 +196,9 @@ class Pod(Seed_Container):
         self.top.scale(factor)
         self.bottom.scale(factor)
 
+    def _sort_seeds(self):
+        self.seeds.sort(key=lambda seed: self._real_z(seed))
+
 
 class Plant(Seed_Container):
     @classmethod
