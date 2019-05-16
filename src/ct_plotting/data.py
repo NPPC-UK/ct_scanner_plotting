@@ -55,6 +55,7 @@ class Pod(Seed_Container):
         self.bottom = Point(*list(bottom))
         self.name = name
         self.spine = None
+        self._real_length = None
 
         for seed in seeds:
             g_obj = Seed(seed)
@@ -156,17 +157,23 @@ class Pod(Seed_Container):
         )
 
     def _real_z(self, seed):
-        return integrate.quad(
-            self._arc_length_integrand, self.bottom.z, seed.position.z
-        )[0]
+        if seed.real_z is None:
+            seed.real_z = integrate.quad(
+                self._arc_length_integrand, self.bottom.z, seed.position.z
+            )[0]
+
+        return seed.real_z
 
     def real_zs(self):
         return [self._real_z(seed) for seed in self.seeds]
 
     def real_length(self):
-        return integrate.quad(
-            self._arc_length_integrand, self.bottom.z, self.top.z
-        )[0]
+        if self._real_length is None:
+            self._real_length = integrate.quad(
+                self._arc_length_integrand, self.bottom.z, self.top.z
+            )[0]
+
+        return self._real_length
 
     def fit(self):
         xs = [seed.position.x for seed in self.seeds]
@@ -303,6 +310,7 @@ class Seed:
         self.position = Point(*list(seed[9:12]))
         self.volume = seed[5]
         self.surface_area = seed[7]
+        self.real_z = None
 
     def sphericity(self):
         return (
