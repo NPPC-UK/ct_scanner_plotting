@@ -11,8 +11,19 @@ from scipy.stats import gaussian_kde
 from scipy.stats.stats import pearsonr
 
 
+pool = None
+
+
+def _get_pool():
+    global pool
+    if pool is None:
+        pool = ProcessingPool(3)
+
+    return pool
+
+
 def plot_swarm_property(containers, prop_fn, property_name="Property"):
-    prop = [prop_fn(con) for con in containers]
+    prop = _get_pool().map(prop_fn, containers)
     names = [con.name for con in containers]
 
     fig = plt.figure(1, figsize=(11, 8))
@@ -27,8 +38,7 @@ def plot_swarm_property(containers, prop_fn, property_name="Property"):
 
 def plot_bar_property(containers, prop_fn, property_name="Property"):
     prop = []
-    with ProcessingPool(3) as p:
-        prop = p.map(prop_fn, containers)
+    prop = _get_pool().map(prop_fn, containers)
 
     names = [con.name for con in containers]
 
@@ -50,7 +60,7 @@ def plot_bar_property(containers, prop_fn, property_name="Property"):
 
 
 def plot_sorted_property(containers, prop_fn, property_name="Property"):
-    prop = [prop_fn(con) for con in containers]
+    prop = _get_pool().map(prop_fn, containers)
     names = [con.name for con in containers]
     median_prop = median(prop)
 
@@ -170,8 +180,8 @@ def plot_property_vs_property(
     x_prop_name="X Prop",
     y_prop_name="Y Prop",
 ):
-    x_prop = [x_prop_fn(con) for con in containers]
-    y_prop = [y_prop_fn(con) for con in containers]
+    x_prop = _get_pool().map(x_prop_fn, containers)
+    y_prop = _get_pool().map(y_prop_fn, containers)
     left, width = 0.1, 0.65
     bottom, height = 0.35, 0.60
 
@@ -191,7 +201,7 @@ def plot_property_vs_property(
 def plot_pearson_correlations(containers, props_fns, prop_names):
     props = []
     for fn in props_fns:
-        props.append([fn(con) for con in containers])
+        props.append(_get_pool().map(fn, containers))
 
     correlations = np.zeros((len(props), len(props)))
     p_values = np.ones((len(props), len(props)))
