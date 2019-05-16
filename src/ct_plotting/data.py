@@ -262,6 +262,13 @@ class Plant(Seed_Container):
 
         return zs
 
+    def seed_spacings(self):
+        vs = []
+        for pod in self.pods:
+            vs += pod.seed_spacings()
+
+        return vs
+
 
 class Genotype(Seed_Container):
     @classmethod
@@ -303,6 +310,13 @@ class Genotype(Seed_Container):
             zs += plant.real_zs()
 
         return zs
+
+    def seed_spacings(self):
+        vs = []
+        for plant in self.plants:
+            vs += plant.seed_spacings()
+
+        return vs
 
 
 class Seed:

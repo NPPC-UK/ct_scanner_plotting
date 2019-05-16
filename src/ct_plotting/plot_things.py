@@ -402,17 +402,11 @@ def plot(pods, outdir, plot, genotype_lookup):
             "bar_pod_lengths",
         )
     elif plot == 21:
-
-        def seed_spacings(genotype):
-            vs = []
-            for plant in genotype.plants:
-                for pod in plant.pods:
-                    vs += pod.seed_spacings()
-            return vs
-
         save(
             plot_bar_property(
-                genotypes, seed_spacings, property_name="seed spacings"
+                genotypes,
+                Genotype.seed_spacings,
+                property_name="seed spacings",
             ),
             "bar_seed_spacings",
         )

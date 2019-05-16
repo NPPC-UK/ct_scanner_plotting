@@ -4,8 +4,8 @@ from itertools import combinations
 import matplotlib.pyplot as plt
 from matplotlib.ticker import NullFormatter
 import seaborn as sns
-
 import numpy as np
+from pathos.multiprocessing import ProcessingPool
 
 from scipy.stats import gaussian_kde
 from scipy.stats.stats import pearsonr
@@ -26,7 +26,10 @@ def plot_swarm_property(containers, prop_fn, property_name="Property"):
 
 
 def plot_bar_property(containers, prop_fn, property_name="Property"):
-    prop = [prop_fn(con) for con in containers]
+    prop = []
+    with ProcessingPool(3) as p:
+        prop = p.map(prop_fn, containers)
+
     names = [con.name for con in containers]
 
     fig = plt.figure(1, figsize=(11, 8))
