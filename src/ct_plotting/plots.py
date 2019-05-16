@@ -29,11 +29,6 @@ def plot_bar_property(containers, prop_fn, property_name="Property"):
     prop = [prop_fn(con) for con in containers]
     names = [con.name for con in containers]
 
-    for thing in prop:
-        print(type(thing))
-        for next_thing in thing:
-            print(type(next_thing))
-
     fig = plt.figure(1, figsize=(11, 8))
     axBar = fig.add_axes([0.05, 0.3, 0.949, 0.62], title=property_name)
     axBar.boxplot(
