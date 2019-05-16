@@ -199,6 +199,13 @@ class Pod(Seed_Container):
     def _sort_seeds(self):
         self.seeds.sort(key=lambda seed: self._real_z(seed))
 
+    def seed_spacings(self):
+        spacings = []
+        for seed_1, seed_2 in zip(self.seeds[:-1], self.seeds[1:]):
+            spacings.append(self._real_z(seed_2) - self._real_z(seed_1))
+
+        return spacings
+
 
 class Plant(Seed_Container):
     @classmethod

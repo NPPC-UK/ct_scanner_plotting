@@ -39,6 +39,7 @@ available_plots = {
     18: "Boxplot of seed density grouped by genotype",
     19: "Boxplot of total seed volume in pods grouped by genotype",
     20: "Boxplot of pod length grouped by genotype",
+    21: "Boxplot of seed spacings grouped by genotype",
 }
 
 
@@ -399,6 +400,21 @@ def plot(pods, outdir, plot, genotype_lookup):
                 genotypes, pod_lengths, property_name="pod length"
             ),
             "bar_pod_lengths",
+        )
+    elif plot == 21:
+
+        def seed_spacings(genotype):
+            vs = []
+            for plant in genotype.plants:
+                for pod in plant.pods:
+                    vs += pod.seed_spacings()
+            return vs
+
+        save(
+            plot_bar_property(
+                genotypes, seed_spacings, property_name="seed spacings"
+            ),
+            "bar_seed_spacings",
         )
 
 
