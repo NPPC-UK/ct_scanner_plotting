@@ -158,16 +158,16 @@ def get_data(meta_file, base_path):
         # matching.  I collect on the entire generator and retrieve the first
         # item.
         try:
-            seeds_file = list(csv_dir.glob("*.ISQ-raw_stats.csv"))[0]
+            seeds_file = list(csv_dir.glob("*.ISQ-raw.csv"))[0]
         except IndexError:
             continue
 
         try:
-            length_file = list(csv_dir.glob("*.ISQlength.csv"))[0]
+            dims_file = list(csv_dir.glob("*.ISQdims.csv"))[0]
         except IndexError:
             continue
 
-        pod = Pod.pod_from_files(seeds_file, length_file, scan[0])
+        pod = Pod.pod_from_files(seeds_file, dims_file, scan[0])
 
         pods.append(pod)
 

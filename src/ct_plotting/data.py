@@ -70,11 +70,11 @@ class Pod(Seed_Container):
 
     @classmethod
     def pod_from_files(cls, seeds_file, length_file, name):
-        length = np.genfromtxt(length_file, delimiter=",", skip_header=0)
+        length = np.genfromtxt(length_file, delimiter=",", skip_header=1)
         return cls(
             np.genfromtxt(seeds_file, delimiter=",", skip_header=1),
-            length[4:],
-            length[1:4],
+            length[-1][0:3],
+            length[0][0:3],
             name,
         )
 

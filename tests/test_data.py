@@ -413,9 +413,12 @@ def setup_module(module):
             ],
         ]
     )
-    module.length = np.array([2000, 0, 0, 0, 0, 0, 2000])
+    module.length = np.array([
+        [0, 0, 0, 98374, 897234],
+        [0, 0, 2000, 982, 98234],
+    ])
     module.pod = Pod(
-        module.grain_data, module.length[4:], length[1:4], "TestPod"
+        module.grain_data, module.length[-1][0:3], length[0][0:3], "TestPod"
     )
 
 
@@ -448,13 +451,14 @@ def test_pod_can_load_grain_from_file(tmpdir):
         delimiter=",",
         header="some, header, dont, worry, about, it",
     )
-    np.savetxt(tmpdir / "lengths.csv", length, delimiter=",")
+    np.savetxt(tmpdir / "lengths.csv", length, delimiter=",",
+               header="some, additional, header, worry, even, less")
 
     p_file = Pod.pod_from_files(
         tmpdir / "grain.csv", tmpdir / "lengths.csv", "TestName"
     )
 
-    p_direct = Pod(grain_data, length[4:], length[1:4], "TestName")
+    p_direct = Pod(grain_data, length[-1][0:3], length[0][0:3], "TestName")
     assert p_direct == p_file
 
 
@@ -477,9 +481,9 @@ def test_pod_filters_grains_less_than_10_from_ends():
                 7.94433970e-02,
                 3.07358037e00,
                 0.00000000e00,
-                length[1],
-                length[2],
-                length[3] + 9.9999999,
+                length[0][0],
+                length[0][1],
+                length[0][2] + 9.9999999,
                 1.00000000e00,
                 1.00000000e00,
             ],
@@ -493,9 +497,9 @@ def test_pod_filters_grains_less_than_10_from_ends():
                 7.94433970e-02,
                 3.07358037e00,
                 0.00000000e00,
-                length[4],
-                length[5],
-                length[6] - 9.9999999,
+                length[-1][0],
+                length[-1][1],
+                length[-1][2] - 9.9999999,
                 1.00000000e00,
                 1.00000000e00,
             ],
@@ -503,7 +507,7 @@ def test_pod_filters_grains_less_than_10_from_ends():
         axis=0,
     )
 
-    imp_pod = Pod(implausible_grains, length[4:], length[1:4], "Implausible")
+    imp_pod = Pod(implausible_grains, length[-1][0:3], length[0][0:3], "Implausible")
     imp_pod.filter()
     assert imp_pod == pod
 
@@ -536,7 +540,7 @@ def test_point_magnitud_norm_is_correct_at_2_36():
 
 def test_plant_correctly_calculates_list_of_properties():
     pods = [
-        Pod(grain_data, length[4:], length[1:4], "TestPod{}".format(i))
+        Pod(grain_data, length[-1][0:3], length[0][0:3], "TestPod{}".format(i))
         for i in range(0, 10)
     ]
 
@@ -553,13 +557,13 @@ def test_group_from_pods_correctly_groups_by_similar_name():
     group3 = []
     for i in range(0, 10):
         group1.append(
-            Pod(grain_data, length[4:], length[1:4], "Group1Pod_{}".format(i))
+            Pod(grain_data, length[-1][0:3], length[0][0:3], "Group1Pod_{}".format(i))
         )
         group2.append(
-            Pod(grain_data, length[4:], length[1:4], "Group2Pod_{}".format(i))
+            Pod(grain_data, length[-1][0:3], length[0][0:3], "Group2Pod_{}".format(i))
         )
         group3.append(
-            Pod(grain_data, length[4:], length[1:4], "Group3Pod_{}".format(i))
+            Pod(grain_data, length[-1][0:3], length[0][0:3], "Group3Pod_{}".format(i))
         )
 
     plants = Plant.group_from_pods(
