@@ -51,8 +51,7 @@ class Seed_Container:
 class Pod(Seed_Container):
     def __init__(self, seeds, dims, name):
         self.seeds = []
-        # The centroid and Major/Minor axes diameters of each slice
-        self.dims = dims
+        self.centroids = [Point(*c[0:3]) for c in dims]
         self.name = name
         self.spine = None
         self._real_length = None
@@ -76,10 +75,10 @@ class Pod(Seed_Container):
         )
 
     def _top(self):
-        return Point(*self.dims[-1][0:3])
+        return self.centroids[-1]
 
     def _bottom(self):
-        return Point(*self.dims[0][0:3])
+        return self.centroids[0]
 
     def volumes(self):
         return [g.volume for g in self.seeds]
