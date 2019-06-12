@@ -90,11 +90,6 @@ class Pod(Seed_Container):
         return [g.sphericity() for g in self.seeds]
 
     def filter(self):
-        # It is not possible to fit the spine accurately after filtering, so do
-        # now.
-        if self.spine is None:
-            self.fit()
-
         self.seeds = [
             seed
             for seed, near_ends in zip(self.seeds, self._near_ends())
