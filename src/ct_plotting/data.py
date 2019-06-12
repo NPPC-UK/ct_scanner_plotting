@@ -178,13 +178,13 @@ class Pod(Seed_Container):
         return self._real_length
 
     def fit(self):
-        xs = [seed.position.x for seed in self.seeds]
+        xs = [centroid.position.x for centroid in self.centroids]
         xs.append(self._top().x)
         xs.insert(0, self._bottom().x)
-        ys = [seed.position.y for seed in self.seeds]
+        ys = [centroid.position.y for centroid in self.centroids]
         ys.append(self._top().y)
         ys.insert(0, self._bottom().y)
-        zs = [seed.position.z for seed in self.seeds]
+        zs = [centroid.position.z for centroid in self.centroids]
         zs.append(self._top().z)
         zs.insert(0, self._bottom().z)
 
