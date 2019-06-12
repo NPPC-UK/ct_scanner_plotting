@@ -4,7 +4,7 @@ from ct_plotting.data import Pod, Point, Plant
 import pytest
 
 grain_data = None
-length = None
+dims = None
 pod = None
 
 
@@ -413,12 +413,28 @@ def setup_module(module):
             ],
         ]
     )
-    module.length = np.array(
-        [[0, 0, 0, 98374, 897234], [0, 0, 2000, 982, 98234]]
+    module.dims = np.array(
+        [
+            [0, 0, 0, 98374, 897234],
+            [0, 0, 2, 9234, 887234],
+            [0, 0, 4, 9234, 887234],
+            [0, 0, 5, 9234, 887234],
+            [0, 0, 6, 9234, 887234],
+            [0, 0, 7, 9234, 887234],
+            [0, 0, 8, 9234, 887234],
+            [0, 0, 9, 9234, 887234],
+            [0, 0, 10, 9234, 887234],
+            [0, 0, 11, 9234, 887234],
+            [0, 0, 12, 9234, 887234],
+            [0, 0, 13, 9234, 887234],
+            [0, 0, 14, 9234, 887234],
+            [0, 0, 15, 9234, 887234],
+            [0, 0, 16, 9234, 887234],
+            [0, 0, 17, 9234, 887234],
+            [0, 0, 2000, 982, 98234],
+        ]
     )
-    module.pod = Pod(
-        module.grain_data, module.length[-1][0:3], length[0][0:3], "TestPod"
-    )
+    module.pod = Pod(module.grain_data, module.dims, "TestPod")
 
 
 def test_calculate_correct_volume():
@@ -451,23 +467,27 @@ def test_pod_can_load_grain_from_file(tmpdir):
         header="some, header, dont, worry, about, it",
     )
     np.savetxt(
-        tmpdir / "lengths.csv",
-        length,
+        tmpdir / "dims.csv",
+        dims,
         delimiter=",",
         header="some, additional, header, worry, even, less",
     )
 
     p_file = Pod.pod_from_files(
-        tmpdir / "grain.csv", tmpdir / "lengths.csv", "TestName"
+        tmpdir / "grain.csv", tmpdir / "dims.csv", "TestName"
     )
 
-    p_direct = Pod(grain_data, length[-1][0:3], length[0][0:3], "TestName")
+    p_direct = Pod(grain_data, dims, "TestName")
     assert p_direct == p_file
 
 
 def test_pod_rejects_impossible_pod_geometry():
     with pytest.raises(ValueError):
-        Pod(grain_data, [0, 0, 1], [0, 0, 0], "ImpossiblePod")
+        Pod(
+            grain_data,
+            [[0, 0, 1, 982374, 234897], [0, 0, 0, 3284, 9823]],
+            "ImpossiblePod",
+        )
 
 
 def test_pod_filters_grains_less_than_10_from_ends():
@@ -484,9 +504,9 @@ def test_pod_filters_grains_less_than_10_from_ends():
                 7.94433970e-02,
                 3.07358037e00,
                 0.00000000e00,
-                length[0][0],
-                length[0][1],
-                length[0][2] + 9.9999999,
+                dims[0][0],
+                dims[0][1],
+                dims[0][2] + 9.9999999,
                 1.00000000e00,
                 1.00000000e00,
             ],
@@ -500,9 +520,9 @@ def test_pod_filters_grains_less_than_10_from_ends():
                 7.94433970e-02,
                 3.07358037e00,
                 0.00000000e00,
-                length[-1][0],
-                length[-1][1],
-                length[-1][2] - 9.9999999,
+                dims[-1][0],
+                dims[-1][1],
+                dims[-1][2] - 9.9999999,
                 1.00000000e00,
                 1.00000000e00,
             ],
@@ -510,9 +530,7 @@ def test_pod_filters_grains_less_than_10_from_ends():
         axis=0,
     )
 
-    imp_pod = Pod(
-        implausible_grains, length[-1][0:3], length[0][0:3], "Implausible"
-    )
+    imp_pod = Pod(implausible_grains, dims, "Implausible")
     imp_pod.filter()
     assert imp_pod == pod
 
@@ -544,10 +562,7 @@ def test_point_magnitud_norm_is_correct_at_2_36():
 
 
 def test_plant_correctly_calculates_list_of_properties():
-    pods = [
-        Pod(grain_data, length[-1][0:3], length[0][0:3], "TestPod{}".format(i))
-        for i in range(0, 10)
-    ]
+    pods = [Pod(grain_data, dims, "TestPod{}".format(i)) for i in range(0, 10)]
 
     plant = Plant(pods, "TestPlant")
     assert True
@@ -561,30 +576,9 @@ def test_group_from_pods_correctly_groups_by_similar_name():
     group2 = []
     group3 = []
     for i in range(0, 10):
-        group1.append(
-            Pod(
-                grain_data,
-                length[-1][0:3],
-                length[0][0:3],
-                "Group1Pod_{}".format(i),
-            )
-        )
-        group2.append(
-            Pod(
-                grain_data,
-                length[-1][0:3],
-                length[0][0:3],
-                "Group2Pod_{}".format(i),
-            )
-        )
-        group3.append(
-            Pod(
-                grain_data,
-                length[-1][0:3],
-                length[0][0:3],
-                "Group3Pod_{}".format(i),
-            )
-        )
+        group1.append(Pod(grain_data, dims, "Group1Pod_{}".format(i)))
+        group2.append(Pod(grain_data, dims, "Group2Pod_{}".format(i)))
+        group3.append(Pod(grain_data, dims, "Group3Pod_{}".format(i)))
 
     plants = Plant.group_from_pods(
         group1 + group2 + group3, lambda name: name[:-3]

@@ -49,10 +49,9 @@ class Seed_Container:
 
 
 class Pod(Seed_Container):
-    def __init__(self, seeds, top, bottom, name):
+    def __init__(self, seeds, dims, name):
         self.seeds = []
-        self.top = Point(*list(top))
-        self.bottom = Point(*list(bottom))
+        self.dims = dims
         self.name = name
         self.spine = None
         self._real_length = None
@@ -61,8 +60,8 @@ class Pod(Seed_Container):
             g_obj = Seed(seed)
 
             if (
-                g_obj.position.z < self.bottom.z
-                or g_obj.position.z > self.top.z
+                g_obj.position.z < self._bottom().z
+                or g_obj.position.z > self._top().z
             ):
                 raise ValueError("Seed {} is outside pod limits".format(g_obj))
 
@@ -70,13 +69,16 @@ class Pod(Seed_Container):
 
     @classmethod
     def pod_from_files(cls, seeds_file, length_file, name):
-        length = np.genfromtxt(length_file, delimiter=",", skip_header=1)
+        dims = np.genfromtxt(length_file, delimiter=",", skip_header=1)
         return cls(
-            np.genfromtxt(seeds_file, delimiter=",", skip_header=1),
-            length[-1][0:3],
-            length[0][0:3],
-            name,
+            np.genfromtxt(seeds_file, delimiter=",", skip_header=1), dims, name
         )
+
+    def _top(self):
+        return Point(*self.dims[-1][0:3])
+
+    def _bottom(self):
+        return Point(*self.dims[0][0:3])
 
     def volumes(self):
         return [g.volume for g in self.seeds]
@@ -103,13 +105,13 @@ class Pod(Seed_Container):
         return len(self.seeds)
 
     def length(self):
-        return (self.top - self.bottom).norm()
+        return (self._top() - self._bottom()).norm()
 
     def _near_ends(self):
         near_ends = []
         for idx, seed in enumerate(self.seeds):
-            bottom_dist = (seed.position - self.bottom).norm()
-            top_dist = (seed.position - self.top).norm()
+            bottom_dist = (seed.position - self._bottom()).norm()
+            top_dist = (seed.position - self._top()).norm()
 
             near_ends.append(
                 bottom_dist < 0.02 * self.real_length()
@@ -131,8 +133,8 @@ class Pod(Seed_Container):
 
         return (
             seeds_equal
-            and self.top == other.top
-            and self.bottom == other.bottom
+            and self._top() == other._top()
+            and self._bottom() == other._bottom()
         )
 
     def __str__(self):
@@ -159,7 +161,7 @@ class Pod(Seed_Container):
     def _real_z(self, seed):
         if seed.real_z is None:
             seed.real_z = integrate.quad(
-                self._arc_length_integrand, self.bottom.z, seed.position.z
+                self._arc_length_integrand, self._bottom().z, seed.position.z
             )[0]
 
         return seed.real_z
@@ -170,21 +172,21 @@ class Pod(Seed_Container):
     def real_length(self):
         if self._real_length is None:
             self._real_length = integrate.quad(
-                self._arc_length_integrand, self.bottom.z, self.top.z
+                self._arc_length_integrand, self._bottom().z, self._top().z
             )[0]
 
         return self._real_length
 
     def fit(self):
         xs = [seed.position.x for seed in self.seeds]
-        xs.append(self.top.x)
-        xs.insert(0, self.bottom.x)
+        xs.append(self._top().x)
+        xs.insert(0, self._bottom().x)
         ys = [seed.position.y for seed in self.seeds]
-        ys.append(self.top.y)
-        ys.insert(0, self.bottom.y)
+        ys.append(self._top().y)
+        ys.insert(0, self._bottom().y)
         zs = [seed.position.z for seed in self.seeds]
-        zs.append(self.top.z)
-        zs.insert(0, self.bottom.z)
+        zs.append(self._top().z)
+        zs.insert(0, self._bottom().z)
 
         x_params = np.polyfit(zs, xs, 3)
         y_params = np.polyfit(zs, ys, 3)
@@ -200,8 +202,8 @@ class Pod(Seed_Container):
         for seed in self.seeds:
             seed.scale(factor)
 
-        self.top.scale(factor)
-        self.bottom.scale(factor)
+        self._top().scale(factor)
+        self._bottom().scale(factor)
 
     def _sort_seeds(self):
         self.seeds.sort(key=lambda seed: self._real_z(seed))
