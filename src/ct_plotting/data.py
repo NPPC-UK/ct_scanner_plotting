@@ -51,6 +51,7 @@ class Seed_Container:
 class Pod(Seed_Container):
     def __init__(self, seeds, dims, name):
         self.seeds = []
+        # The centroid and Major/Minor axes diameters of each slice
         self.dims = dims
         self.name = name
         self.spine = None
