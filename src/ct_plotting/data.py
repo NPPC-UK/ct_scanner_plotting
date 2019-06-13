@@ -91,11 +91,15 @@ class Pod(Seed_Container):
         return [g.sphericity() for g in self.seeds]
 
     def filter(self):
-        self.seeds = [
-            seed
-            for seed, near_ends in zip(self.seeds, self._near_ends())
-            if not near_ends
-        ]
+        good_seeds = []
+        for seed in self.seeds:
+            near_slice_idx = np.searchsorted(self.dims[:, 2], seed.position.z)
+            if abs(self.dims[near_slice_idx, 2] - seed.position.z) > 10:
+                good_seeds.append(seed)
+            elif self.dims[near_slice_idx, 4] > 3 * seed.radius():
+                good_seeds.append(seed)
+
+        self.seeds = good_seeds
 
     def n_seeds(self):
         return len(self.seeds)
@@ -324,6 +328,7 @@ class Seed:
         ) / self.surface_area
 
     def __eq__(self, other):
+        print(self.position, other.position)
         return (
             self.position == other.position
             and self.volume == other.volume
@@ -334,6 +339,9 @@ class Seed:
         self.position.scale(factor)
         self.volume /= factor ** 3
         self.surface_area /= factor ** 2
+
+    def radius(self):
+        return (3.0 / 4.0) * (1.0 / math.pi) * self.volume ** (1.0 / 3.0)
 
 
 class Point:
