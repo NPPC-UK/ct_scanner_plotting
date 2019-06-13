@@ -51,7 +51,8 @@ class Seed_Container:
 class Pod(Seed_Container):
     def __init__(self, seeds, dims, name):
         self.seeds = []
-        self.centroids = [Point(*c[0:3]) for c in dims]
+        self.slices = [Slice(*s) for s in dims]
+        self.dims = np.asarray(dims)
         self.name = name
         self.spine = None
         self._real_length = None
@@ -75,10 +76,10 @@ class Pod(Seed_Container):
         )
 
     def _top(self):
-        return self.centroids[-1]
+        return self.slices[-1].position
 
     def _bottom(self):
-        return self.centroids[0]
+        return self.slices[0].position
 
     def volumes(self):
         return [g.volume for g in self.seeds]
@@ -173,15 +174,9 @@ class Pod(Seed_Container):
         return self._real_length
 
     def fit(self):
-        xs = [centroid.position.x for centroid in self.centroids]
-        xs.append(self._top().x)
-        xs.insert(0, self._bottom().x)
-        ys = [centroid.position.y for centroid in self.centroids]
-        ys.append(self._top().y)
-        ys.insert(0, self._bottom().y)
-        zs = [centroid.position.z for centroid in self.centroids]
-        zs.append(self._top().z)
-        zs.insert(0, self._bottom().z)
+        xs = [s.position.x for s in self.slices]
+        ys = [s.position.y for s in self.slices]
+        zs = [s.position.z for s in self.slices]
 
         x_params = np.polyfit(zs, xs, 3)
         y_params = np.polyfit(zs, ys, 3)
@@ -366,3 +361,10 @@ class Point:
 
     def norm(self):
         return math.sqrt(self.x ** 2 + self.y ** 2 + self.z ** 2)
+
+
+class Slice:
+    def __init__(self, x, y, z, minor, major):
+        self.position = Point(x, y, z)
+        self.major = major
+        self.minor = minor
