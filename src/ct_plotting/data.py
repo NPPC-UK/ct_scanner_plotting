@@ -3,6 +3,7 @@ import math
 
 import numpy as np
 from scipy import integrate
+import jenks_natural_breaks
 
 
 def _list_of_props(containers, fn):
@@ -100,6 +101,12 @@ class Pod(Seed_Container):
                 good_seeds.append(seed)
 
         self.seeds = good_seeds
+
+        breaks = jenks_natural_breaks.classify(np.array(self.real_zs()), 0)
+        print(breaks)
+        self.seeds = [
+            seed for seed in self.seeds if self._real_z(seed) > breaks[0]
+        ]
 
     def n_seeds(self):
         return len(self.seeds)
