@@ -3,6 +3,7 @@ import math
 
 import numpy as np
 from scipy import integrate
+from sklearn.mixture import GaussianMixture
 
 
 def _list_of_props(containers, fn):
@@ -100,6 +101,16 @@ class Pod(Seed_Container):
                 good_seeds.append(seed)
 
         self.seeds = good_seeds
+
+        # Attempt fitting
+        real_zs = self.real_zs()
+        gmm = GaussianMixture(
+            n_components=2, means_init=[[0], [500]], weights_init=[0.01, 0.99]
+        )
+        labels = gmm.fit_predict(np.array(real_zs).reshape(-1, 1))
+        self.seeds = [
+            seed for seed, label in zip(self.seeds, labels) if label == 1
+        ]
 
     def n_seeds(self):
         return len(self.seeds)
