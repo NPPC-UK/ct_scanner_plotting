@@ -46,7 +46,7 @@ setup(
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.6",
     ],
-    install_requires=["numpy", "matplotlib", "pre-commit"],
+    install_requires=["numpy", "matplotlib", "pre-commit", "jenkspy"],
     tests_require=["pytest"],
     entry_points={"console_scripts": ["plot = ct_plotting.plot_things:main"]},
 )
