@@ -102,12 +102,6 @@ class Pod(Seed_Container):
 
         self.seeds = good_seeds
 
-        breaks = jenks_natural_breaks.classify(np.array(self.real_zs()), 0)
-        print(breaks)
-        self.seeds = [
-            seed for seed in self.seeds if self._real_z(seed) > breaks[0]
-        ]
-
     def n_seeds(self):
         return len(self.seeds)
 
@@ -271,6 +265,16 @@ class Plant(Seed_Container):
             vs += pod.seed_spacings()
 
         return vs
+
+    def filter(self):
+        breaks = jenks_natural_breaks.classify(
+            np.sort(np.array(self.real_zs())), 2
+        )
+        print(breaks)
+        for pod in self.pods:
+            pod.seeds = [
+                seed for seed in pod.seeds if pod._real_z(seed) > breaks[0]
+            ]
 
 
 class Genotype(Seed_Container):
