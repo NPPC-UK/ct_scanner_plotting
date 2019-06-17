@@ -174,12 +174,7 @@ def get_data(meta_file, base_path):
     return pods, genotype_lookup
 
 
-def plot(pods, outdir, plot, genotype_lookup):
-    plants = Plant.group_from_pods(pods, lambda name: name[:-2])
-    genotypes = Genotype.group_from_plants(
-        plants, lambda name: genotype_lookup[name]
-    )
-
+def plot(pods, plants, genotypes, outdir, plot, genotype_lookup):
     def save(fig, fname):
         fig.savefig(outdir / "plot_{}.svg".format(fname))
         fig.clf()
@@ -432,12 +427,21 @@ def main(args):
         for pod in pods:
             pod.scale(args.scale)
 
+    plants = Plant.group_from_pods(pods, lambda name: name[:-2])
+    genotypes = Genotype.group_from_plants(
+        plants, lambda name: genotype_lookup[name]
+    )
+
     if args.filter:
         for pod in pods:
             pod.filter()
+        for plant in plants:
+            plant.filter()
+        for genotype in genotypes:
+            genotype.filter()
 
     for p in args.plot:
-        plot(pods, args.output_dir, p, genotype_lookup)
+        plot(pods, plants, genotypes, args.output_dir, p, genotype_lookup)
 
     if args.print_stats:
         print(

@@ -47,6 +47,9 @@ class Seed_Container:
     def n_seeds(self):
         return len(self.seeds)
 
+    def filter(self):
+        pass
+
 
 class Pod(Seed_Container):
     def __init__(self, seeds, dims, name):
