@@ -205,7 +205,6 @@ def plot_property_vs_property(
 
 def plot_pearson_correlations(containers, props_fns, prop_names):
     props = []
-    print(props_fns)
     for fn in props_fns:
         #   props.append(_get_pool().map(fn, containers))
         props.append(list(map(fn, containers)))
