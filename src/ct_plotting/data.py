@@ -66,8 +66,8 @@ class Pod(Seed_Container):
         new_maj = []
         new_min = []
         for i in range(0, len(dims)):
-            start = i - 2 if i > 1 else 0
-            end = start + 5 if start + 5 <= len(dims) else -1
+            start = max(0, i - 60)
+            end = min(len(dims) - 1, start + 61)
             new_maj.append(median(self.dims[start:end, 3]))
             new_min.append(median(self.dims[start:end, 4]))
 
