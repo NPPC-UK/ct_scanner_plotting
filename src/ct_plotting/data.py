@@ -284,6 +284,9 @@ class Plant(Seed_Container):
 
         return vs
 
+    def pod_widths(self):
+        return [pod.width() for pod in self.pods]
+
 
 class Genotype(Seed_Container):
     @classmethod
@@ -354,6 +357,9 @@ class Genotype(Seed_Container):
                         for seed in pod.seeds
                         if pod._real_z(seed) > cutoff
                     ]
+
+    def pod_widths(self):
+        return _list_of_props(self.plants, Plant.pod_widths)
 
 
 class Seed:
