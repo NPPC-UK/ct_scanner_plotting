@@ -41,6 +41,8 @@ available_plots = {
     20: "Boxplot of pod length grouped by genotype",
     21: "Boxplot of seed spacings grouped by genotype",
     22: "Boxplot of pod widths grouped by genotype",
+    23: "Boxplot of silique length grouped by genotype",
+    24: "Boxplot of beak length grouped by genotype",
 }
 
 
@@ -418,6 +420,36 @@ def plot(pods, plants, genotypes, outdir, plot, genotype_lookup):
                 genotypes, Genotype.pod_widths, property_name="pod widths"
             ),
             "bar_pod_widths",
+        )
+    elif plot == 23:
+
+        def pod_lengths(genotype):
+            vs = []
+            for plant in genotype.plants:
+                for pod in plant.pods:
+                    vs.append(pod.silique_length())
+            return vs
+
+        save(
+            plot_bar_property(
+                genotypes, pod_lengths, property_name="silique length"
+            ),
+            "bar_silique_lengths",
+        )
+    elif plot == 24:
+
+        def pod_lengths(genotype):
+            vs = []
+            for plant in genotype.plants:
+                for pod in plant.pods:
+                    vs.append(pod.beak_length())
+            return vs
+
+        save(
+            plot_bar_property(
+                genotypes, pod_lengths, property_name="beak length"
+            ),
+            "bar_beak_lengths",
         )
 
 
