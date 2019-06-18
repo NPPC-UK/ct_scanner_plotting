@@ -23,7 +23,8 @@ def _get_pool():
 
 
 def plot_swarm_property(containers, prop_fn, property_name="Property"):
-    prop = _get_pool().map(prop_fn, containers)
+    #    prop = _get_pool().map(prop_fn, containers)
+    prop = list(map(prop_fn, containers))
     names = [con.name for con in containers]
 
     fig = plt.figure(1, figsize=(11, 8))
@@ -38,7 +39,8 @@ def plot_swarm_property(containers, prop_fn, property_name="Property"):
 
 def plot_bar_property(containers, prop_fn, property_name="Property"):
     prop = []
-    prop = _get_pool().map(prop_fn, containers)
+    #   prop = _get_pool().map(prop_fn, containers)
+    prop = list(map(prop_fn, containers))
 
     names = [con.name for con in containers]
 
@@ -60,7 +62,8 @@ def plot_bar_property(containers, prop_fn, property_name="Property"):
 
 
 def plot_sorted_property(containers, prop_fn, property_name="Property"):
-    prop = _get_pool().map(prop_fn, containers)
+    #    prop = _get_pool().map(prop_fn, containers)
+    prop = list(map(prop_fn, containers))
     names = [con.name for con in containers]
     median_prop = median(prop)
 
@@ -180,8 +183,10 @@ def plot_property_vs_property(
     x_prop_name="X Prop",
     y_prop_name="Y Prop",
 ):
-    x_prop = _get_pool().map(x_prop_fn, containers)
-    y_prop = _get_pool().map(y_prop_fn, containers)
+    # x_prop = _get_pool().map(x_prop_fn, containers)
+    # y_prop = _get_pool().map(y_prop_fn, containers)
+    x_prop = list(map(x_prop_fn, containers))
+    y_prop = list(map(y_prop_fn, containers))
     left, width = 0.1, 0.65
     bottom, height = 0.35, 0.60
 
@@ -201,7 +206,8 @@ def plot_property_vs_property(
 def plot_pearson_correlations(containers, props_fns, prop_names):
     props = []
     for fn in props_fns:
-        props.append(_get_pool().map(fn, containers))
+        #   props.append(_get_pool().map(fn, containers))
+        props.append(list(map(fn, containers)))
 
     correlations = np.zeros((len(props), len(props)))
     p_values = np.ones((len(props), len(props)))
@@ -242,6 +248,7 @@ def plot_pearson_correlations(containers, props_fns, prop_names):
                 ha="center",
                 va="center",
                 color="w",
+                fontsize=8,
             )
 
     return fig

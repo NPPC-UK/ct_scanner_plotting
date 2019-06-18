@@ -1,8 +1,10 @@
-from statistics import mean
+from statistics import mean, median
 import math
 
 import numpy as np
 from scipy import integrate
+from scipy.signal import find_peaks
+from sklearn.neighbors import KernelDensity
 
 
 def _list_of_props(containers, fn):
@@ -59,6 +61,20 @@ class Pod(Seed_Container):
         self.name = name
         self.spine = None
         self._real_length = None
+        self._silique_length = None
+        self._beak_length = None
+
+        # Smooth the major/minor axis diameters, they are rather noisy.
+        new_maj = []
+        new_min = []
+        for i in range(0, len(dims)):
+            start = max(0, i - 60)
+            end = min(len(dims) - 1, start + 61)
+            new_maj.append(median(self.dims[start:end, 3]))
+            new_min.append(median(self.dims[start:end, 4]))
+
+        self.dims[:, 3] = new_maj
+        self.dims[:, 4] = new_min
 
         for seed in seeds:
             g_obj = Seed(seed)
@@ -104,11 +120,30 @@ class Pod(Seed_Container):
 
         self.seeds = good_seeds
 
+    def width(self):
+        return max(self.dims[60:-60, 3])
+
     def n_seeds(self):
         return len(self.seeds)
 
     def length(self):
         return (self._top() - self._bottom()).norm()
+
+    def silique_length(self):
+        if self._silique_length is None:
+            self._silique_length = (
+                self._top() - self.seeds[0].position
+            ).norm()
+
+        return self._silique_length
+
+    def beak_length(self):
+        if self._beak_length is None:
+            self._beak_length = (
+                self.seeds[0].position - self._bottom()
+            ).norm()
+
+        return self._beak_length
 
     def _near_ends(self):
         near_ends = []
@@ -141,7 +176,7 @@ class Pod(Seed_Container):
         )
 
     def __str__(self):
-        format_str = "{}, {}, {}, {}, {}, {}, {}, {}"
+        format_str = "{}, {}, {}, {}, {}, {}, {}, {}, {}, {}"
         return format_str.format(
             self.name,
             self.length(),
@@ -150,7 +185,9 @@ class Pod(Seed_Container):
             self.mean_volume(),
             self.mean_surface_area(),
             self.real_length(),
-            self.n_seeds() / self.real_length(),
+            self.silique_length(),
+            self.beak_length(),
+            self.n_seeds() / self.silique_length(),
         )
 
     def _arc_length_integrand(self, p):
@@ -268,6 +305,9 @@ class Plant(Seed_Container):
 
         return vs
 
+    def pod_widths(self):
+        return [pod.width() for pod in self.pods]
+
 
 class Genotype(Seed_Container):
     @classmethod
@@ -316,6 +356,31 @@ class Genotype(Seed_Container):
             vs += plant.seed_spacings()
 
         return vs
+
+    def filter(self):
+        sorted_zs = np.sort(np.array(self.real_zs())).reshape(-1, 1)
+        if sorted_zs[0] > 100:
+            return
+
+        kde = KernelDensity(bandwidth=20).fit(sorted_zs)
+        xs = np.linspace(0, max(sorted_zs), 1000)
+        score = kde.score_samples(xs)
+
+        peaks, _ = find_peaks(score * -1, height=10)
+
+        if len(peaks) > 0:
+            cutoff = xs[min(peaks)]
+
+            for plant in self.plants:
+                for pod in plant.pods:
+                    pod.seeds = [
+                        seed
+                        for seed in pod.seeds
+                        if pod._real_z(seed) > cutoff
+                    ]
+
+    def pod_widths(self):
+        return _list_of_props(self.plants, Plant.pod_widths)
 
 
 class Seed:

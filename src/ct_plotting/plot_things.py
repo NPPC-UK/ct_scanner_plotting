@@ -40,6 +40,9 @@ available_plots = {
     19: "Boxplot of total seed volume in pods grouped by genotype",
     20: "Boxplot of pod length grouped by genotype",
     21: "Boxplot of seed spacings grouped by genotype",
+    22: "Boxplot of pod widths grouped by genotype",
+    23: "Boxplot of silique length grouped by genotype",
+    24: "Boxplot of beak length grouped by genotype",
 }
 
 
@@ -319,15 +322,21 @@ def plot(pods, plants, genotypes, outdir, plot, genotype_lookup):
             plot_pearson_correlations(
                 pods,
                 [
+                    Pod.width,
                     Pod.length,
+                    Pod.silique_length,
+                    Pod.beak_length,
                     Pod.n_seeds,
                     Pod.mean_volume,
                     Pod.mean_sphericity,
                     Pod.mean_surface_area,
-                    lambda pod: pod.n_seeds() / pod.length(),
+                    lambda pod: pod.n_seeds() / pod.silique_length(),
                 ],
                 [
+                    "widths",
                     "length",
+                    "silique_length",
+                    "beak_length",
                     "n_seeds",
                     "volumes",
                     "sphericities",
@@ -353,7 +362,7 @@ def plot(pods, plants, genotypes, outdir, plot, genotype_lookup):
             ds = []
             for plant in genotype.plants:
                 for pod in plant.pods:
-                    ds.append(pod.n_seeds() / pod.length())
+                    ds.append(pod.n_seeds() / pod.silique_length())
 
             return ds
 
@@ -405,6 +414,43 @@ def plot(pods, plants, genotypes, outdir, plot, genotype_lookup):
             ),
             "bar_seed_spacings",
         )
+    elif plot == 22:
+        save(
+            plot_bar_property(
+                genotypes, Genotype.pod_widths, property_name="pod widths"
+            ),
+            "bar_pod_widths",
+        )
+    elif plot == 23:
+
+        def pod_lengths(genotype):
+            vs = []
+            for plant in genotype.plants:
+                for pod in plant.pods:
+                    vs.append(pod.silique_length())
+            return vs
+
+        save(
+            plot_bar_property(
+                genotypes, pod_lengths, property_name="silique length"
+            ),
+            "bar_silique_lengths",
+        )
+    elif plot == 24:
+
+        def pod_lengths(genotype):
+            vs = []
+            for plant in genotype.plants:
+                for pod in plant.pods:
+                    vs.append(pod.beak_length())
+            return vs
+
+        save(
+            plot_bar_property(
+                genotypes, pod_lengths, property_name="beak length"
+            ),
+            "bar_beak_lengths",
+        )
 
 
 def main(args):
@@ -446,7 +492,8 @@ def main(args):
     if args.print_stats:
         print(
             "Name, Length, N_Seeds, Sphericity, Volume, Surface Area, "
-            "Real Length, Density (N_Seeds/Real Length), Genotype"
+            "Real Length, Silique Length, Beak Length, "
+            "Density (N_Seeds/Silique Length), Genotype"
         )
         for pod in pods:
             print(str(pod), ",", genotype_lookup[pod.name[:-2]])
