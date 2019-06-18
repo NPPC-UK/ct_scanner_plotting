@@ -1,4 +1,4 @@
-from statistics import mean
+from statistics import mean, median
 import math
 
 import numpy as np
@@ -62,6 +62,17 @@ class Pod(Seed_Container):
         self.spine = None
         self._real_length = None
 
+        new_maj = []
+        new_min = []
+        for i in range(0, len(dims)):
+            start = i - 2 if i > 1 else 0
+            end = start + 5 if start + 5 <= len(dims) else -1
+            new_maj.append(median(self.dims[start:end, 3]))
+            new_min.append(median(self.dims[start:end, 4]))
+
+        self.dims[:, 3] = new_maj
+        self.dims[:, 4] = new_min
+
         for seed in seeds:
             g_obj = Seed(seed)
 
@@ -105,6 +116,9 @@ class Pod(Seed_Container):
                 good_seeds.append(seed)
 
         self.seeds = good_seeds
+
+    def width(self):
+        return max(self.dims[:, 3])
 
     def n_seeds(self):
         return len(self.seeds)
