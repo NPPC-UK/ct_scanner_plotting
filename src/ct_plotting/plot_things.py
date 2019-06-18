@@ -442,13 +442,31 @@ def main(args):
         plants, lambda name: genotype_lookup[name]
     )
 
+    print(hex(id(pods[783])))
+    for genotype in genotypes:
+        for plant in genotype.plants:
+            for pod in plant.pods:
+                if pod.name == pods[783].name:
+                    print(hex(id(pod)))
+                    break
+
     if args.filter:
-        for pod in pods:
-            pod.filter()
-        for plant in plants:
-            plant.filter()
+        plants = []
         for genotype in genotypes:
             genotype.filter()
+            plants += genotype.plants
+
+        pods = []
+        for plant in plants:
+            pods += plant.pods
+
+    print(hex(id(pods[783])))
+    for genotype in genotypes:
+        for plant in genotype.plants:
+            for pod in plant.pods:
+                if pod.name == pods[783].name:
+                    print(hex(id(pod)))
+                    break
 
     for p in args.plot:
         plot(pods, plants, genotypes, args.output_dir, p, genotype_lookup)
