@@ -329,13 +329,17 @@ class Genotype(Seed_Container):
         score = kde.score_samples(xs)
 
         peaks, _ = find_peaks(score * -1)
-        cutoff = xs[min(peaks)]
 
-        for plant in self.plants:
-            for pod in plant.pods:
-                pod.seeds = [
-                    seed for seed in pod.seeds if pod._real_z(seed) > cutoff
-                ]
+        if len(peaks) > 0:
+            cutoff = xs[min(peaks)]
+
+            for plant in self.plants:
+                for pod in plant.pods:
+                    pod.seeds = [
+                        seed
+                        for seed in pod.seeds
+                        if pod._real_z(seed) > cutoff
+                    ]
 
 
 class Seed:
