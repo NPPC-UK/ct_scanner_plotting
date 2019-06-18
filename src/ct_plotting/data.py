@@ -119,7 +119,7 @@ class Pod(Seed_Container):
         self.seeds = good_seeds
 
     def width(self):
-        return max(self.dims[:, 3])
+        return max(self.dims[60:-60, 3])
 
     def n_seeds(self):
         return len(self.seeds)
