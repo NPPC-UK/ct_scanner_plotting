@@ -326,7 +326,7 @@ def plot(pods, plants, genotypes, outdir, plot, genotype_lookup):
                     Pod.mean_volume,
                     Pod.mean_sphericity,
                     Pod.mean_surface_area,
-                    lambda pod: pod.n_seeds() / pod.length(),
+                    lambda pod: pod.n_seeds() / pod.silique_length(),
                 ],
                 [
                     "widths",
