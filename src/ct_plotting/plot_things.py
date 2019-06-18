@@ -319,6 +319,7 @@ def plot(pods, plants, genotypes, outdir, plot, genotype_lookup):
             plot_pearson_correlations(
                 pods,
                 [
+                    Pod.width,
                     Pod.length,
                     Pod.n_seeds,
                     Pod.mean_volume,
@@ -327,6 +328,7 @@ def plot(pods, plants, genotypes, outdir, plot, genotype_lookup):
                     lambda pod: pod.n_seeds() / pod.length(),
                 ],
                 [
+                    "widths",
                     "length",
                     "n_seeds",
                     "volumes",
