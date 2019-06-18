@@ -356,7 +356,7 @@ def plot(pods, plants, genotypes, outdir, plot, genotype_lookup):
             ds = []
             for plant in genotype.plants:
                 for pod in plant.pods:
-                    ds.append(pod.n_seeds() / pod.length())
+                    ds.append(pod.n_seeds() / pod.silique_length())
 
             return ds
 
