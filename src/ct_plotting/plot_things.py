@@ -322,6 +322,8 @@ def plot(pods, plants, genotypes, outdir, plot, genotype_lookup):
                 [
                     Pod.width,
                     Pod.length,
+                    Pod.silique_length,
+                    Pod.beak_length,
                     Pod.n_seeds,
                     Pod.mean_volume,
                     Pod.mean_sphericity,
@@ -331,6 +333,8 @@ def plot(pods, plants, genotypes, outdir, plot, genotype_lookup):
                 [
                     "widths",
                     "length",
+                    "silique_length",
+                    "beak_length",
                     "n_seeds",
                     "volumes",
                     "sphericities",
