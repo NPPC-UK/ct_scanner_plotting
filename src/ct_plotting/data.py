@@ -1,4 +1,4 @@
-from statistics import mean
+from statistics import mean, median
 import math
 
 import numpy as np
@@ -62,6 +62,18 @@ class Pod(Seed_Container):
         self.spine = None
         self._real_length = None
 
+        # Smooth the major/minor axis diameters, they are rather noisy.
+        new_maj = []
+        new_min = []
+        for i in range(0, len(dims)):
+            start = max(0, i - 60)
+            end = min(len(dims) - 1, start + 61)
+            new_maj.append(median(self.dims[start:end, 3]))
+            new_min.append(median(self.dims[start:end, 4]))
+
+        self.dims[:, 3] = new_maj
+        self.dims[:, 4] = new_min
+
         for seed in seeds:
             g_obj = Seed(seed)
 
@@ -105,6 +117,9 @@ class Pod(Seed_Container):
                 good_seeds.append(seed)
 
         self.seeds = good_seeds
+
+    def width(self):
+        return max(self.dims[60:-60, 3])
 
     def n_seeds(self):
         return len(self.seeds)
@@ -270,6 +285,9 @@ class Plant(Seed_Container):
 
         return vs
 
+    def pod_widths(self):
+        return [pod.width() for pod in self.pods]
+
 
 class Genotype(Seed_Container):
     @classmethod
@@ -340,6 +358,9 @@ class Genotype(Seed_Container):
                         for seed in pod.seeds
                         if pod._real_z(seed) > cutoff
                     ]
+
+    def pod_widths(self):
+        return _list_of_props(self.plants, Plant.pod_widths)
 
 
 class Seed:

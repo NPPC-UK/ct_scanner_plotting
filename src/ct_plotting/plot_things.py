@@ -40,6 +40,7 @@ available_plots = {
     19: "Boxplot of total seed volume in pods grouped by genotype",
     20: "Boxplot of pod length grouped by genotype",
     21: "Boxplot of seed spacings grouped by genotype",
+    22: "Boxplot of pod widths grouped by genotype",
 }
 
 
@@ -319,6 +320,7 @@ def plot(pods, plants, genotypes, outdir, plot, genotype_lookup):
             plot_pearson_correlations(
                 pods,
                 [
+                    Pod.width,
                     Pod.length,
                     Pod.n_seeds,
                     Pod.mean_volume,
@@ -327,6 +329,7 @@ def plot(pods, plants, genotypes, outdir, plot, genotype_lookup):
                     lambda pod: pod.n_seeds() / pod.length(),
                 ],
                 [
+                    "widths",
                     "length",
                     "n_seeds",
                     "volumes",
@@ -404,6 +407,13 @@ def plot(pods, plants, genotypes, outdir, plot, genotype_lookup):
                 property_name="seed spacings",
             ),
             "bar_seed_spacings",
+        )
+    elif plot == 22:
+        save(
+            plot_bar_property(
+                genotypes, Genotype.pod_widths, property_name="pod widths"
+            ),
+            "bar_pod_widths",
         )
 
 
