@@ -248,6 +248,7 @@ def plot_pearson_correlations(containers, props_fns, prop_names):
                 ha="center",
                 va="center",
                 color="w",
+                fontsize=8,
             )
 
     return fig
