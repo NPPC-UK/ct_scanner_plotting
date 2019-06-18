@@ -61,6 +61,8 @@ class Pod(Seed_Container):
         self.name = name
         self.spine = None
         self._real_length = None
+        self._silique_length = None
+        self._beak_length = None
 
         # Smooth the major/minor axis diameters, they are rather noisy.
         new_maj = []
@@ -126,6 +128,20 @@ class Pod(Seed_Container):
 
     def length(self):
         return (self._top() - self._bottom()).norm()
+
+    def silique_length(self):
+        if self._silique_length is None:
+            self._silique_length = (
+                self._top() - self.seeds[0].position
+            ).norm()
+
+        return self._silique_length
+
+    def beak_length(self):
+        if self._beak_length is None:
+            self._beak_length = (self.seeds[0].position - self._top()).norm()
+
+        return self._silique_length
 
     def _near_ends(self):
         near_ends = []
