@@ -3,6 +3,8 @@ import math
 
 import numpy as np
 from scipy import integrate
+from scipy.signal import find_peaks
+from sklearn.neighbors import KernelDensity
 
 
 def _list_of_props(containers, fn):
@@ -316,6 +318,28 @@ class Genotype(Seed_Container):
             vs += plant.seed_spacings()
 
         return vs
+
+    def filter(self):
+        sorted_zs = np.sort(np.array(self.real_zs())).reshape(-1, 1)
+        if sorted_zs[0] > 100:
+            return
+
+        kde = KernelDensity(bandwidth=20).fit(sorted_zs)
+        xs = np.linspace(0, max(sorted_zs), 1000)
+        score = kde.score_samples(xs)
+
+        peaks, _ = find_peaks(score * -1, height=10)
+
+        if len(peaks) > 0:
+            cutoff = xs[min(peaks)]
+
+            for plant in self.plants:
+                for pod in plant.pods:
+                    pod.seeds = [
+                        seed
+                        for seed in pod.seeds
+                        if pod._real_z(seed) > cutoff
+                    ]
 
 
 class Seed:
