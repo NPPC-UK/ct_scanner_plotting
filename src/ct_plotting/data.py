@@ -139,9 +139,11 @@ class Pod(Seed_Container):
 
     def beak_length(self):
         if self._beak_length is None:
-            self._beak_length = (self.seeds[0].position - self._top()).norm()
+            self._beak_length = (
+                self.seeds[0].position - self._bottom()
+            ).norm()
 
-        return self._silique_length
+        return self._beak_length
 
     def _near_ends(self):
         near_ends = []
