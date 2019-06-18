@@ -324,7 +324,7 @@ class Genotype(Seed_Container):
         if sorted_zs[0] > 100:
             return
 
-        kde = KernelDensity(bandwidth=10).fit(sorted_zs)
+        kde = KernelDensity(bandwidth=20).fit(sorted_zs)
         xs = np.linspace(0, max(sorted_zs), 1000)
         score = kde.score_samples(xs)
 
