@@ -62,6 +62,7 @@ class Pod(Seed_Container):
         self.spine = None
         self._real_length = None
 
+        # Smooth the major/minor axis diameters, they are rather noisy.
         new_maj = []
         new_min = []
         for i in range(0, len(dims)):
