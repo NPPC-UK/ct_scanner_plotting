@@ -328,7 +328,7 @@ class Genotype(Seed_Container):
         xs = np.linspace(0, max(sorted_zs), 1000)
         score = kde.score_samples(xs)
 
-        peaks, _ = find_peaks(score * -1)
+        peaks, _ = find_peaks(score * -1, height=10)
 
         if len(peaks) > 0:
             cutoff = xs[min(peaks)]
