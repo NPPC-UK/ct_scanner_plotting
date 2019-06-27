@@ -133,10 +133,10 @@ def filter_seeds(seeds, bottom, top):
     return np.delete(filtered_seeds, to_delete, 0)
 
 
-def get_data(meta_file, base_path):
+def get_data(meta_file, base_path, plant_name_fn):
     meta_type = np.dtype(
         [
-            ("sample_name", np.unicode_, 12),
+            ("sample_name", np.unicode_, 13),
             ("folder", np.unicode_, 8),
             ("genotype", np.unicode_, 50),
         ]
@@ -154,7 +154,7 @@ def get_data(meta_file, base_path):
     genotype_lookup = {}
 
     for scan in meta_data:
-        genotype_lookup[scan[0][:-2]] = scan[2]
+        genotype_lookup[plant_name_fn(scan[0])] = scan[2]
         csv_dir = base_path / scan[1]
 
         # Glob returns a generator.  I know that there is only one file
@@ -470,6 +470,12 @@ def plot(pods, plants, genotypes, outdir, plot, genotype_lookup, scale=1.0):
 
 
 def main(args):
+    def plant_name(name):
+        if args.pod_suffix_length == 0:
+            return name
+        else:
+            return name[: -args.pod_suffix_length]
+
     if args.list:
         print("Possible plots:")
         for key, description in available_plots.items():
@@ -483,9 +489,9 @@ def main(args):
         else args.working_dir / args.meta_file
     )
 
-    pods, genotype_lookup = get_data(meta_file, args.working_dir)
+    pods, genotype_lookup = get_data(meta_file, args.working_dir, plant_name)
 
-    plants = Plant.group_from_pods(pods, lambda name: name[:-2])
+    plants = Plant.group_from_pods(pods, plant_name)
     genotypes = Genotype.group_from_plants(
         plants, lambda name: genotype_lookup[name]
     )
@@ -512,11 +518,11 @@ def main(args):
     if args.print_stats:
         print(
             "Name, Length, N_Seeds, Sphericity, Volume, Surface Area, "
-            "Real Length, Silique Length, Beak Length, "
+            "Real Length, Silique Length, Beak Length, Width, "
             "Density (N_Seeds/Silique Length), Genotype"
         )
         for pod in pods:
-            print(str(pod), ",", genotype_lookup[pod.name[:-2]])
+            print(str(pod), ",", genotype_lookup[plant_name(pod.name)])
 
 
 def plot_distances():
@@ -646,6 +652,16 @@ def get_arguments():
         action="store_true",
         default=True,
         help="all distances are measured from the top of the scan",
+    )
+    parser.add_argument(
+        "--pod_suffix_length",
+        action="store",
+        type=int,
+        default=2,
+        help=(
+            "The number of characters at the end of the bar code that "
+            "identify the pod.  If there is only one pod per plant, pass 0"
+        ),
     )
 
     args = parser.parse_args()

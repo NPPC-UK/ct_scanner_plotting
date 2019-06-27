@@ -190,7 +190,7 @@ class Pod(Seed_Container):
         )
 
     def __str__(self):
-        format_str = "{}, {}, {}, {}, {}, {}, {}, {}, {}, {}"
+        format_str = "{}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}"
         return format_str.format(
             self.name,
             self.length(),
@@ -201,6 +201,7 @@ class Pod(Seed_Container):
             self.real_length(),
             self.silique_length(),
             self.beak_length(),
+            self.width(),
             self.n_seeds() / self.silique_length(),
         )
 
