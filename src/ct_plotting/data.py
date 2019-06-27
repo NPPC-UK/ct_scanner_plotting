@@ -139,17 +139,23 @@ class Pod(Seed_Container):
 
     def silique_length(self):
         if self._silique_length is None:
-            self._silique_length = (
-                self._top() - self.seeds[0].position
-            ).norm()
+            if len(self.seeds) != 0:
+                self._silique_length = (
+                    self._top() - self.seeds[0].position
+                ).norm()
+            else:
+                self._silique_length = self.real_length()
 
         return self._silique_length
 
     def beak_length(self):
         if self._beak_length is None:
-            self._beak_length = (
-                self.seeds[0].position - self._bottom()
-            ).norm()
+            if len(self.seeds) != 0:
+                self._beak_length = (
+                    self.seeds[0].position - self._bottom()
+                ).norm()
+            else:
+                self._beak_length = 0
 
         return self._beak_length
 
