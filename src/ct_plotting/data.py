@@ -76,16 +76,24 @@ class Pod(Seed_Container):
         self.dims[:, 3] = new_maj
         self.dims[:, 4] = new_min
 
-        for seed in seeds:
-            g_obj = Seed(seed)
+        # Guard against single or no seed
+        if seeds.ndim == 0:
+            pass
+        elif seeds.ndim == 1:
+            self.seeds = [Seed(seeds)]
+        else:
+            for seed in seeds:
+                g_obj = Seed(seed)
 
-            if (
-                g_obj.position.z < self._bottom().z
-                or g_obj.position.z > self._top().z
-            ):
-                raise ValueError("Seed {} is outside pod limits".format(g_obj))
+                if (
+                    g_obj.position.z < self._bottom().z
+                    or g_obj.position.z > self._top().z
+                ):
+                    raise ValueError(
+                        "Seed {} is outside pod limits".format(g_obj)
+                    )
 
-            self.seeds.append(g_obj)
+                self.seeds.append(g_obj)
 
     @classmethod
     def pod_from_files(cls, seeds_file, length_file, name):
