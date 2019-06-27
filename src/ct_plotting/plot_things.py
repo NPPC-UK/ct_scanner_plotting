@@ -177,7 +177,7 @@ def get_data(meta_file, base_path):
     return pods, genotype_lookup
 
 
-def plot(pods, plants, genotypes, outdir, plot, genotype_lookup):
+def plot(pods, plants, genotypes, outdir, plot, genotype_lookup, scale=1.0):
     def save(fig, fname):
         fig.savefig(outdir / "plot_{}.svg".format(fname))
         fig.clf()
@@ -185,7 +185,9 @@ def plot(pods, plants, genotypes, outdir, plot, genotype_lookup):
     if plot == 0:
         save(
             plot_bar_property(
-                genotypes, Genotype.volumes, property_name="volumes of seeds"
+                genotypes,
+                lambda x: [v / scale ** 3 for v in Genotype.volumes(x)],
+                property_name="volumes of seeds",
             ),
             "bar_volumes_of_seeds",
         )
@@ -209,7 +211,7 @@ def plot(pods, plants, genotypes, outdir, plot, genotype_lookup):
         save(
             plot_bar_property(
                 genotypes,
-                Genotype.surface_areas,
+                lambda x: [s / scale ** 2 for s in Genotype.surface_areas(x)],
                 property_name="surface area of seeds",
             ),
             "bar_surface_area_of_seeds",
@@ -217,7 +219,9 @@ def plot(pods, plants, genotypes, outdir, plot, genotype_lookup):
     elif plot == 4:
         save(
             plot_sorted_property(
-                pods, Pod.mean_volume, property_name="mean volume of seeds"
+                pods,
+                lambda x: Pod.mean_volume(x) / scale ** 3,
+                property_name="mean volume of seeds",
             ),
             "mean_volume_of_seeds",
         )
@@ -232,7 +236,7 @@ def plot(pods, plants, genotypes, outdir, plot, genotype_lookup):
         save(
             plot_sorted_property(
                 plants,
-                Plant.mean_volume,
+                lambda x: Plant.mean_volume(x) / scale ** 3,
                 property_name="grouped mean volume of seeds",
             ),
             "grouped_mean_volume_of_seeds",
@@ -258,7 +262,9 @@ def plot(pods, plants, genotypes, outdir, plot, genotype_lookup):
     elif plot == 9:
         save(
             plot_sorted_property(
-                pods, Pod.length, property_name="length of pod"
+                pods,
+                lambda x: Pod.length(x) / scale,
+                property_name="length of pod",
             ),
             "length_of_pod",
         )
@@ -266,7 +272,7 @@ def plot(pods, plants, genotypes, outdir, plot, genotype_lookup):
         save(
             plot_property_vs_property(
                 pods,
-                Pod.length,
+                lambda x: Pod.length(x) / scale,
                 Pod.n_seeds,
                 "length of pod",
                 "number of seeds",
@@ -277,8 +283,8 @@ def plot(pods, plants, genotypes, outdir, plot, genotype_lookup):
         save(
             plot_property_vs_property(
                 pods,
-                Pod.length,
-                Pod.mean_volume,
+                lambda x: Pod.length(x) / scale,
+                lambda x: Pod.mean_volume(x) / scale ** 3,
                 "length of pod",
                 "mean volume of seeds",
             ),
@@ -289,7 +295,7 @@ def plot(pods, plants, genotypes, outdir, plot, genotype_lookup):
             plot_property_vs_property(
                 pods,
                 Pod.n_seeds,
-                Pod.mean_volume,
+                lambda x: Pod.mean_volume(x) / scale ** 3,
                 "number of seeds",
                 "mean volume of seeds",
             ),
@@ -299,7 +305,7 @@ def plot(pods, plants, genotypes, outdir, plot, genotype_lookup):
         save(
             plot_property_vs_property(
                 pods,
-                Pod.mean_volume,
+                lambda x: Pod.mean_volume(x) / scale ** 3,
                 Pod.mean_sphericity,
                 "mean volume of seeds",
                 "mean sphericities",
@@ -310,7 +316,7 @@ def plot(pods, plants, genotypes, outdir, plot, genotype_lookup):
         save(
             plot_property_vs_property(
                 pods,
-                Pod.mean_surface_area,
+                lambda x: Pod.mean_surface_area(x) / scale ** 2,
                 Pod.mean_sphericity,
                 "mean surface area of seeds",
                 "mean sphericities",
@@ -348,12 +354,20 @@ def plot(pods, plants, genotypes, outdir, plot, genotype_lookup):
         )
     elif plot == 16:
         save(
-            plot_swarm_property(plants, Plant.real_zs, "seed position"),
+            plot_swarm_property(
+                plants,
+                lambda x: [z / scale for z in Plant.real_zs(x)],
+                "seed position",
+            ),
             "real_zs_plant",
         )
     elif plot == 17:
         save(
-            plot_swarm_property(genotypes, Genotype.real_zs, "seed position"),
+            plot_swarm_property(
+                genotypes,
+                lambda x: [z / scale for z in Genotype.real_zs(x)],
+                "seed position",
+            ),
             "real_zs_genotype",
         )
     elif plot == 18:
@@ -362,7 +376,7 @@ def plot(pods, plants, genotypes, outdir, plot, genotype_lookup):
             ds = []
             for plant in genotype.plants:
                 for pod in plant.pods:
-                    ds.append(pod.n_seeds() / pod.silique_length())
+                    ds.append(pod.n_seeds() / (pod.silique_length() / scale))
 
             return ds
 
@@ -378,7 +392,7 @@ def plot(pods, plants, genotypes, outdir, plot, genotype_lookup):
             vs = []
             for plant in genotype.plants:
                 for pod in plant.pods:
-                    vs.append(sum(pod.volumes()))
+                    vs.append(sum(pod.volumes()) / scale ** 3)
 
             return vs
 
@@ -396,7 +410,7 @@ def plot(pods, plants, genotypes, outdir, plot, genotype_lookup):
             vs = []
             for plant in genotype.plants:
                 for pod in plant.pods:
-                    vs.append(pod.real_length())
+                    vs.append(pod.real_length() / scale)
             return vs
 
         save(
@@ -409,7 +423,7 @@ def plot(pods, plants, genotypes, outdir, plot, genotype_lookup):
         save(
             plot_bar_property(
                 genotypes,
-                Genotype.seed_spacings,
+                lambda x: [s / scale for s in Genotype.seed_spacings(x)],
                 property_name="seed spacings",
             ),
             "bar_seed_spacings",
@@ -417,7 +431,9 @@ def plot(pods, plants, genotypes, outdir, plot, genotype_lookup):
     elif plot == 22:
         save(
             plot_bar_property(
-                genotypes, Genotype.pod_widths, property_name="pod widths"
+                genotypes,
+                lambda x: [w / scale for w in Genotype.pod_widths(x)],
+                property_name="pod widths",
             ),
             "bar_pod_widths",
         )
@@ -427,7 +443,7 @@ def plot(pods, plants, genotypes, outdir, plot, genotype_lookup):
             vs = []
             for plant in genotype.plants:
                 for pod in plant.pods:
-                    vs.append(pod.silique_length())
+                    vs.append(pod.silique_length() / scale)
             return vs
 
         save(
@@ -442,7 +458,7 @@ def plot(pods, plants, genotypes, outdir, plot, genotype_lookup):
             vs = []
             for plant in genotype.plants:
                 for pod in plant.pods:
-                    vs.append(pod.beak_length())
+                    vs.append(pod.beak_length() / scale)
             return vs
 
         save(
@@ -469,10 +485,6 @@ def main(args):
 
     pods, genotype_lookup = get_data(meta_file, args.working_dir)
 
-    if args.scale != 1.0:
-        for pod in pods:
-            pod.scale(args.scale)
-
     plants = Plant.group_from_pods(pods, lambda name: name[:-2])
     genotypes = Genotype.group_from_plants(
         plants, lambda name: genotype_lookup[name]
@@ -487,7 +499,15 @@ def main(args):
             genotype.filter()
 
     for p in args.plot:
-        plot(pods, plants, genotypes, args.output_dir, p, genotype_lookup)
+        plot(
+            pods,
+            plants,
+            genotypes,
+            args.output_dir,
+            p,
+            genotype_lookup,
+            args.scale,
+        )
 
     if args.print_stats:
         print(
