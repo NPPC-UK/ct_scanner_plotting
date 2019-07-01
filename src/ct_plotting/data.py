@@ -388,11 +388,14 @@ class Genotype(Seed_Container):
 
             for plant in self.plants:
                 for pod in plant.pods:
-                    pod.seeds = [
+                    filtered_seeds = [
                         seed
                         for seed in pod.seeds
                         if pod._real_z(seed) > cutoff
                     ]
+                    # as long as we don't remove all the seeds
+                    if len(filtered_seeds) != 0:
+                        pod.seeds = filtered_seeds
 
     def pod_widths(self):
         return _list_of_props(self.plants, Plant.pod_widths)
