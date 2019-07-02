@@ -404,8 +404,8 @@ class Genotype(Seed_Container):
 class Seed:
     def __init__(self, seed):
         self.position = Point(*list(seed[7:10]))
-        self.volume = seed[5]
-        self.surface_area = seed[7]
+        self.volume = seed[3]
+        self.surface_area = seed[5]
         self.real_z = None
 
     def sphericity(self):
