@@ -11,6 +11,8 @@ from ct_plotting.plots import (
     plot_pearson_correlations,
     plot_bar_property,
     plot_swarm_property,
+    plot_spine_debug,
+    plot_kde_debug,
 )
 
 from ct_plotting.data import Pod, Plant, Genotype
@@ -515,6 +517,16 @@ def main(args):
             args.scale,
         )
 
+    print(args.plot)
+
+    for p in pods:
+        if p.name in args.plot_spine_debug:
+            plot_spine_debug(p, "spine_debug_{}".format(p.name))
+
+    for g in genotypes:
+        if g.name in args.plot_kde_debug:
+            plot_kde_debug(g, "kde_debug_{}".format(g.name))
+
     if args.print_stats:
         print(
             "Name, Length, N_Seeds, Sphericity, Volume, Surface Area, "
@@ -590,11 +602,31 @@ def get_arguments():
     )
 
     parser.add_argument(
+        "--plot_spine_debug",
+        action="append",
+        nargs="+",
+        default=[[]],
+        type=str,
+        metavar="Pod",
+        help="plot spine fitting debug graphs for the given Pods",
+    )
+
+    parser.add_argument(
+        "--plot_kde_debug",
+        action="append",
+        nargs="+",
+        default=[[]],
+        type=str,
+        metavar="Genotype",
+        help="plot kde graphs for the given Genotypes",
+    )
+
+    parser.add_argument(
         "-P",
         "--plot",
         action="append",
         nargs="+",
-        default=[[]],
+        default=[],
         choices=available_plots,
         type=int,
         help="select which plots to plot",
@@ -666,6 +698,12 @@ def get_arguments():
 
     args = parser.parse_args()
     args.plot = set([item for sublist in args.plot for item in sublist])
+    args.plot_spine_debug = set(
+        [item for sublist in args.plot_spine_debug for item in sublist]
+    )
+    args.plot_kde_debug = set(
+        [item for sublist in args.plot_kde_debug for item in sublist]
+    )
 
     return args
 

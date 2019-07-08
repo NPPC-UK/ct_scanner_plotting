@@ -2,6 +2,7 @@ from statistics import mean, median
 import math
 
 import numpy as np
+import numpy.polynomial.polynomial as poly
 from scipy import integrate
 from scipy.signal import find_peaks
 from sklearn.neighbors import KernelDensity
@@ -237,10 +238,10 @@ class Pod(Seed_Container):
         ys = [s.position.y for s in self.slices]
         zs = [s.position.z for s in self.slices]
 
-        x_params = np.polyfit(zs, xs, 3)
-        y_params = np.polyfit(zs, ys, 3)
+        x_params = poly.polyfit(zs, xs, 3)
+        y_params = poly.polyfit(zs, ys, 3)
 
-        self.spine = (np.poly1d(x_params), np.poly1d(y_params))
+        self.spine = (poly.Polynomial(x_params), poly.Polynomial(y_params))
 
     def scale(self, factor):
         """Scale all dimensions of the pod by a factor of 'factor'
@@ -372,15 +373,18 @@ class Genotype(Seed_Container):
 
         return vs
 
-    def filter(self):
+    def kde(self):
         sorted_zs = np.sort(np.array(self.real_zs())).reshape(-1, 1)
-        if sorted_zs[0] > 100:
-            return
-
         kde = KernelDensity(bandwidth=20).fit(sorted_zs)
         xs = np.linspace(0, max(sorted_zs), 1000)
         score = kde.score_samples(xs)
+        return score, xs
 
+    def filter(self):
+        if min(self.real_zs()) > 100:
+            return
+
+        score, xs = self.kde()
         peaks, _ = find_peaks(score * -1, height=10)
 
         if len(peaks) > 0:
