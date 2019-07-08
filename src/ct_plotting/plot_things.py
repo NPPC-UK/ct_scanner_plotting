@@ -595,8 +595,8 @@ def get_arguments():
         nargs="+",
         default=[[]],
         type=str,
-        metavar="Genotype",
-        help="plot spine fitting debug graphs for the given genotypes",
+        metavar="Pod",
+        help="plot spine fitting debug graphs for the given Pods",
     )
 
     parser.add_argument(
@@ -605,8 +605,8 @@ def get_arguments():
         nargs="+",
         default=[[]],
         type=str,
-        metavar="Genotype",
-        help="plot kde graphs for the given genotypes",
+        metavar="Pod",
+        help="plot kde graphs for the given Pods",
     )
 
     parser.add_argument(
