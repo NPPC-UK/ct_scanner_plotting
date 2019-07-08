@@ -440,14 +440,14 @@ def setup_module(module):
 def test_calculate_correct_volume():
     assert (
         pytest.approx(pod.mean_volume(), 1e-8)
-        == np.mean(grain_data, axis=0)[5]
+        == np.mean(grain_data, axis=0)[3]
     )
 
 
 def test_calculate_correct_surface_area():
     assert (
         pytest.approx(pod.mean_surface_area(), 1e-8)
-        == np.mean(grain_data, axis=0)[7]
+        == np.mean(grain_data, axis=0)[5]
     )
 
 
@@ -456,7 +456,7 @@ def test_sphericities_returns_type_list():
 
 
 def test_volumes_returned_in_insertion_order():
-    assert list(pod.volumes()) == list(grain_data[:, 5])
+    assert list(pod.volumes()) == list(grain_data[:, 3])
 
 
 def test_pod_can_load_grain_from_file(tmpdir):
@@ -498,9 +498,9 @@ def test_pod_filters_grains_too_large_for_pod():
                 4.81600000e-01,
                 1.32230554e00,
                 1.20479616e00,
+                4.36385300e80,
                 3.64212345e-01,
                 1.00935932e00,
-                4.36385300e80,
                 7.94433970e-02,
                 3.07358037e00,
                 0.00000000e00,
@@ -514,9 +514,9 @@ def test_pod_filters_grains_too_large_for_pod():
                 4.81600000e-01,
                 1.32230554e00,
                 1.20479616e00,
+                4.36385300e80,
                 3.64212345e-01,
                 1.00935932e00,
-                4.36385300e80,
                 7.94433970e-02,
                 3.07358037e00,
                 0.00000000e00,

@@ -3,8 +3,12 @@ from itertools import combinations
 
 import matplotlib.pyplot as plt
 from matplotlib.ticker import NullFormatter
+import matplotlib.animation
+from mpl_toolkits.mplot3d import Axes3D
+
 import seaborn as sns
 import numpy as np
+import numpy.polynomial.polynomial as poly
 from pathos.multiprocessing import ProcessingPool
 
 from scipy.stats import gaussian_kde
@@ -12,6 +16,8 @@ from scipy.stats.stats import pearsonr
 
 
 pool = None
+
+Axes3D  # Turn off flake8 warning about unused Axes3D
 
 
 def _get_pool():
@@ -213,7 +219,10 @@ def plot_pearson_correlations(containers, props_fns, prop_names):
     p_values = np.ones((len(props), len(props)))
 
     for i, j in combinations(range(len(props)), 2):
-        pcc, p = pearsonr(props[i], props[j])
+        ith = np.array(props[i])
+        jth = np.array(props[j])
+        bad_idx = ~np.logical_or(np.isnan(ith), np.isnan(jth))
+        pcc, p = pearsonr(np.compress(bad_idx, ith), np.compress(bad_idx, jth))
         correlations[i, j] = pcc
         p_values[i, j] = p
 
@@ -252,3 +261,45 @@ def plot_pearson_correlations(containers, props_fns, prop_names):
             )
 
     return fig
+
+
+def plot_spine_debug(pod, name):
+    xs = [s.position.x for s in pod.slices]
+    ys = [s.position.y for s in pod.slices]
+    zs = [s.position.z for s in pod.slices]
+
+    x_ffit = poly.Polynomial(pod.spine[0])
+    y_ffit = poly.Polynomial(pod.spine[1])
+    x_new = np.linspace(zs[0], zs[-1])
+
+    fig = plt.figure(figsize=[1, 4.8])
+    ax = fig.add_subplot(111, projection="3d")
+    ax.plot(x_ffit(x_new), y_ffit(x_new), x_new)
+    ax.plot(xs, ys, zs, linewidth=0.5)
+    ax.plot(
+        [s.position.x for s in pod.seeds],
+        [s.position.y for s in pod.seeds],
+        [s.position.z for s in pod.seeds],
+        ms=3,
+        linestyle="",
+        markerfacecolor="None",
+        markeredgecolor="green",
+        alpha=0.6,
+        marker="o",
+    )
+
+    ax.view_init(10, 0)
+    phi = np.linspace(0, 2 * np.pi, num=200)
+
+    def update(phi):
+        ax.view_init(10, phi * 180.0 / np.pi)
+
+    ani = matplotlib.animation.FuncAnimation(fig, update, frames=phi)
+    ani.save("plot_{}.gif".format(name), fps=18, dpi=196, writer="imagemagick")
+
+
+def plot_kde_debug(genotype, name):
+    score, xs = genotype.kde()
+    plt.plot(xs, score)
+    plt.savefig("plot_{}.svg".format(name))
+    plt.clf()
