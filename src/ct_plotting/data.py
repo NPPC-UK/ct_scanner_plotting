@@ -373,23 +373,18 @@ class Genotype(Seed_Container):
 
         return vs
 
-    def filter(self):
+    def kde(self):
         sorted_zs = np.sort(np.array(self.real_zs())).reshape(-1, 1)
-        if sorted_zs[0] > 100:
-            return
-
         kde = KernelDensity(bandwidth=20).fit(sorted_zs)
         xs = np.linspace(0, max(sorted_zs), 1000)
         score = kde.score_samples(xs)
+        return score, xs
 
-        if self.name == "Ceska":
-            from matplotlib import pyplot as plt
+    def filter(self):
+        if min(self.real_zs()) > 100:
+            return
 
-            plt.plot(xs, score)
-            plt.savefig("kde_debug.png")
-
-            exit()
-
+        score, xs = self.kde()
         peaks, _ = find_peaks(score * -1, height=10)
 
         if len(peaks) > 0:
