@@ -241,62 +241,6 @@ class Pod(Seed_Container):
         x_params = poly.polyfit(zs, xs, 3)
         y_params = poly.polyfit(zs, ys, 3)
 
-        x_ffit = poly.Polynomial(x_params)
-        y_ffit = poly.Polynomial(y_params)
-        x_new = np.linspace(zs[0], zs[-1])
-        import matplotlib.pyplot as plt
-        import matplotlib.animation
-        from mpl_toolkits.mplot3d import Axes3D
-
-        Axes3D
-
-        plt.plot(x_ffit(x_new), x_new)
-        plt.plot(xs, zs)
-        plt.scatter(
-            [s.position.x for s in self.seeds],
-            [s.position.z for s in self.seeds],
-            s=4,
-        )
-        plt.savefig("fitting_debug_x.svg")
-        plt.clf()
-        plt.plot(y_ffit(x_new), x_new)
-        plt.plot(ys, zs)
-        plt.scatter(
-            [s.position.y for s in self.seeds],
-            [s.position.z for s in self.seeds],
-            s=4,
-        )
-        plt.savefig("fitting_debug_y.svg")
-        plt.clf()
-        fig = plt.figure(figsize=[1, 4.8])
-        ax = fig.add_subplot(111, projection="3d")
-        ax.plot(x_ffit(x_new), y_ffit(x_new), x_new)
-        ax.plot(xs, ys, zs, linewidth=0.5)
-        ax.plot(
-            [s.position.x for s in self.seeds],
-            [s.position.y for s in self.seeds],
-            [s.position.z for s in self.seeds],
-            ms=3,
-            linestyle="",
-            markerfacecolor="None",
-            markeredgecolor="green",
-            alpha=0.6,
-            marker="o",
-        )
-
-        ax.view_init(10, 0)
-        phi = np.linspace(0, 2 * np.pi, num=200)
-
-        def update(phi):
-            ax.view_init(10, phi * 180.0 / np.pi)
-
-        ani = matplotlib.animation.FuncAnimation(fig, update, frames=phi)
-        ani.save("fitting_debug.gif", fps=18, dpi=196, writer="imagemagick")
-
-        ax.view_init(10, 45)
-        fig.savefig("fitting_debug.svg")
-        exit()
-
         self.spine = (np.poly1d(x_params), np.poly1d(y_params))
 
     def scale(self, factor):
