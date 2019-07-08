@@ -518,8 +518,6 @@ def main(args):
             args.scale,
         )
 
-    print(args.plot)
-
     for p in pods:
         if p.name in args.plot_spine_debug:
             plot_spine_debug(p, "spine_debug_{}".format(p.name))
