@@ -219,7 +219,10 @@ def plot_pearson_correlations(containers, props_fns, prop_names):
     p_values = np.ones((len(props), len(props)))
 
     for i, j in combinations(range(len(props)), 2):
-        pcc, p = pearsonr(props[i], props[j])
+        ith = np.array(props[i])
+        jth = np.array(props[j])
+        bad_idx = ~np.logical_or(np.isnan(ith), np.isnan(jth))
+        pcc, p = pearsonr(np.compress(bad_idx, ith), np.compress(bad_idx, jth))
         correlations[i, j] = pcc
         p_values[i, j] = p
 
