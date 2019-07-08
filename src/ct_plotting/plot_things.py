@@ -590,6 +590,26 @@ def get_arguments():
     )
 
     parser.add_argument(
+        "--plot_spine_debug",
+        action="append",
+        nargs="+",
+        default=[[]],
+        type=str,
+        metavar="Genotype",
+        help="plot spine fitting debug graphs for the given genotypes",
+    )
+
+    parser.add_argument(
+        "--plot_kde_debug",
+        action="append",
+        nargs="+",
+        default=[[]],
+        type=str,
+        metavar="Genotype",
+        help="plot kde graphs for the given genotypes",
+    )
+
+    parser.add_argument(
         "-P",
         "--plot",
         action="append",
