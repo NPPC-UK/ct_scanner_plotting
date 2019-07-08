@@ -241,7 +241,7 @@ class Pod(Seed_Container):
         x_params = poly.polyfit(zs, xs, 3)
         y_params = poly.polyfit(zs, ys, 3)
 
-        self.spine = (np.poly1d(x_params), np.poly1d(y_params))
+        self.spine = (poly.Polynomial(x_params), poly.Polynomial(y_params))
 
     def scale(self, factor):
         """Scale all dimensions of the pod by a factor of 'factor'
