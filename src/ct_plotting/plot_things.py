@@ -11,6 +11,8 @@ from ct_plotting.plots import (
     plot_pearson_correlations,
     plot_bar_property,
     plot_swarm_property,
+    plot_spine_debug,
+    plot_kde_debug,
 )
 
 from ct_plotting.data import Pod, Plant, Genotype
@@ -515,6 +517,15 @@ def main(args):
             args.scale,
         )
 
+    print(args.plot)
+
+    for p in pods:
+        if p.name in args.plot_spine_debug:
+            plot_spine_debug(p, "spine_debug_{}".format(p.name))
+
+        if p.name in args.plot_kde_debug:
+            plot_kde_debug(p, "kde_debug_{}".format(p.name))
+
     if args.print_stats:
         print(
             "Name, Length, N_Seeds, Sphericity, Volume, Surface Area, "
@@ -614,7 +625,7 @@ def get_arguments():
         "--plot",
         action="append",
         nargs="+",
-        default=[[]],
+        default=[],
         choices=available_plots,
         type=int,
         help="select which plots to plot",
