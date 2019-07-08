@@ -295,5 +295,8 @@ def plot_spine_debug(pod, name):
     ani.save("plot_{}.gif".format(name), fps=18, dpi=196, writer="imagemagick")
 
 
-def plot_kde_debug(pod):
-    pass
+def plot_kde_debug(genotype, name):
+    score, xs = genotype.kde()
+    plt.plot(xs, score)
+    plt.savefig("plot_{}.svg".format(name))
+    plt.clf()
