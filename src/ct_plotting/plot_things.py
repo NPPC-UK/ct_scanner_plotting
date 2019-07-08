@@ -686,6 +686,12 @@ def get_arguments():
 
     args = parser.parse_args()
     args.plot = set([item for sublist in args.plot for item in sublist])
+    args.plot_spine_debug = set(
+        [item for sublist in args.plot_spine_debug for item in sublist]
+    )
+    args.plot_kde_debug = set(
+        [item for sublist in args.plot_kde_debug for item in sublist]
+    )
 
     return args
 
