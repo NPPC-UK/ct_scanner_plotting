@@ -523,8 +523,9 @@ def main(args):
         if p.name in args.plot_spine_debug:
             plot_spine_debug(p, "spine_debug_{}".format(p.name))
 
-        if p.name in args.plot_kde_debug:
-            plot_kde_debug(p, "kde_debug_{}".format(p.name))
+    for g in genotypes:
+        if g.name in args.plot_kde_debug:
+            plot_kde_debug(g, "kde_debug_{}".format(g.name))
 
     if args.print_stats:
         print(
@@ -616,8 +617,8 @@ def get_arguments():
         nargs="+",
         default=[[]],
         type=str,
-        metavar="Pod",
-        help="plot kde graphs for the given Pods",
+        metavar="Genotype",
+        help="plot kde graphs for the given Genotypes",
     )
 
     parser.add_argument(
