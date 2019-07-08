@@ -150,6 +150,7 @@ def get_data(meta_file, base_path, plant_name_fn):
         usecols=[0, 4, 6],
         dtype=meta_type,
         skip_header=1,
+        comments="#disabled#",
     )
 
     pods = []
