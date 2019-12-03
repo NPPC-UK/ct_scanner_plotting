@@ -1,5 +1,6 @@
 from pathlib import Path
 import argparse
+import csv
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -535,6 +536,31 @@ def main(args):
         for pod in pods:
             print(str(pod), ",", genotype_lookup[plant_name(pod.name)])
 
+        if args.extended_stats:
+            for pod in pods:
+                with open(
+                    args.output_dir / f"{pod.name}_spacings.csv", "w"
+                ) as csvfile:
+                    csv.writer(csvfile).writerows(
+                        [[spacing] for spacing in pod.seed_spacings()]
+                    )
+                with open(
+                    args.output_dir / f"{pod.name}_seed_realz.csv", "w"
+                ) as csvfile:
+                    writer = csv.writer(csvfile)
+                    writer.writerow(["Real Z", "X", "Y", "Z"])
+                    writer.writerows(
+                        [
+                            [
+                                seed.real_z,
+                                seed.position.x,
+                                seed.position.y,
+                                seed.position.z,
+                            ]
+                            for seed in pod.seeds
+                        ]
+                    )
+
 
 def plot_distances():
     all_data = get_data(
@@ -636,6 +662,11 @@ def get_arguments():
         "--print_stats",
         action="store_true",
         help="print stats about the brassica pods",
+    )
+    parser.add_argument(
+        "--extended_stats",
+        action="store_true",
+        help="print seed level stats about the brassica pods",
     )
     parser.add_argument(
         "-d",
