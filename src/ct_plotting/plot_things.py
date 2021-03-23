@@ -738,6 +738,10 @@ def get_arguments():
     return args
 
 
-if __name__ == "__main__":
+def run():
     args = get_arguments()
     main(args)
+
+
+if __name__ == "__main__":
+    main()
