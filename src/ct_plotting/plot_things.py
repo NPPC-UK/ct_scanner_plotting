@@ -473,7 +473,7 @@ def plot(pods, plants, genotypes, outdir, plot, genotype_lookup, scale=1.0):
         )
 
 
-def main(args):
+def run(args):
     def plant_name(name):
         if args.pod_suffix_length == 0:
             return name
@@ -738,9 +738,9 @@ def get_arguments():
     return args
 
 
-def run():
+def main():
     args = get_arguments()
-    main(args)
+    run(args)
 
 
 if __name__ == "__main__":
