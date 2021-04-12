@@ -165,13 +165,15 @@ def get_data(meta_file, base_path, plant_name_fn):
         # matching.  I collect on the entire generator and retrieve the first
         # item.
         try:
-            seeds_file = list(csv_dir.glob("*.ISQ-raw_stats.csv"))[0]
+            seeds_file = list(csv_dir.glob("*.ISQ*-raw_stats.csv"))[0]
         except IndexError:
+            print(f"Couldn't find seeds file {csv_dir}")
             continue
 
         try:
-            dims_file = list(csv_dir.glob("*.ISQdims.csv"))[0]
+            dims_file = list(csv_dir.glob("*.ISQ*dims.csv"))[0]
         except IndexError:
+            print(f"Couldn't find dims file {csv_dir}")
             continue
 
         pod = Pod.pod_from_files(seeds_file, dims_file, scan[0])
@@ -534,7 +536,7 @@ def run(args):
             "Density (N_Seeds/Silique Length), Genotype"
         )
         for pod in pods:
-            print(str(pod), ",", genotype_lookup[plant_name(pod.name)])
+            print(str(pod), ",", f'"{genotype_lookup[plant_name(pod.name)]}"')
 
         if args.extended_stats:
             for pod in pods:
