@@ -99,6 +99,8 @@ class Pod(Seed_Container):
     @classmethod
     def pod_from_files(cls, seeds_file, length_file, name):
         dims = np.genfromtxt(length_file, delimiter=",", skip_header=1)
+        dims = dims[~np.isnan(dims).any(axis=1)]
+
         return cls(
             np.genfromtxt(seeds_file, delimiter=",", skip_header=1), dims, name
         )
@@ -191,7 +193,7 @@ class Pod(Seed_Container):
         )
 
     def __str__(self):
-        format_str = "{}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}"
+        format_str = '"{}", {}, {}, {}, {}, {}, {}, {}, {}, {}, {}'
         return format_str.format(
             self.name,
             self.length(),
