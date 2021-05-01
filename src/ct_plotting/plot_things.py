@@ -137,19 +137,11 @@ def filter_seeds(seeds, bottom, top):
 
 
 def get_data(meta_file, base_path, plant_name_fn):
-    meta_type = np.dtype(
-        [
-            ("sample_name", np.unicode_, 13),
-            ("folder", np.unicode_, 8),
-            ("genotype", np.unicode_, 50),
-        ]
-    )
-
     meta_data = np.genfromtxt(
         meta_file,
         delimiter="\t",
         usecols=[0, 4, 6],
-        dtype=meta_type,
+        dtype=str,
         skip_header=1,
         comments="#disabled#",
     )
@@ -157,6 +149,7 @@ def get_data(meta_file, base_path, plant_name_fn):
     pods = []
     genotype_lookup = {}
 
+    print(meta_data[0])
     for scan in meta_data:
         genotype_lookup[plant_name_fn(scan[0])] = scan[2]
         csv_dir = base_path / scan[1]
